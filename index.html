@@ -1189,7 +1189,29 @@ function resetApiDefaults(){
   modelId='claude-sonnet-4-20250514';
   showToast('✅ 已恢复默认值：claude-sonnet-4-20250514');
 }
-async function testKey(){const btn=document.getElementById('test-btn'),ks=document.getElementById('key-status'),conn=document.getElementById('conn-status');if(btn){btn.disabled=true;btn.textContent='测试中...';}if(ks)ks.textContent='';if(conn)conn.textContent='连接中...';try{const r=await callClaude('world-analyze','请回复"OK"');const ok=r&&r.toLowerCase().includes('ok');if(ks){ks.textContent=ok?'✅ 连接成功':'⚠️ 响应异常';ks.style.color=ok?'var(--gr)':'var(--ye)';}if(conn){conn.textContent=ok?'✅ 已连接':'⚠️ 异常';conn.style.color=ok?'var(--gr)':'var(--ye)';}}catch(e){if(ks){ks.textContent='❌ 失败: '+e.message;ks.style.color='var(--re)';}if(conn){conn.textContent='❌ 失败';conn.style.color='var(--re)';}}if(btn){btn.disabled=false;btn.textContent='⚡ 连通性测试';}}
+async function testKey(){
+  const btn=document.getElementById('test-btn');
+  const ks=document.getElementById('key-status');
+  const conn=document.getElementById('conn-status');
+  if(btn){btn.disabled=true;btn.textContent='测试中...';}
+  if(ks){ks.textContent='';ks.style.color='';}
+  if(conn){conn.textContent='连接中...';conn.style.color='';}
+  // Use a lightweight toolId with minimal tokens
+  var savedMax=maxTokens;
+  maxTokens=200;
+  try{
+    const r=await callClaude('sdance','请回复数字1');
+    maxTokens=savedMax;
+    const ok=r&&r.trim().length>0;
+    if(ks){ks.textContent=ok?'✅ 连接成功':'⚠️ 响应异常';ks.style.color=ok?'var(--gr)':'var(--ye)';}
+    if(conn){conn.textContent=ok?'✅ 已连接':'⚠️ 异常';conn.style.color=ok?'var(--gr)':'var(--ye)';}
+  }catch(e){
+    maxTokens=savedMax;
+    if(ks){ks.textContent='❌ '+e.message.substring(0,40);ks.style.color='var(--re)';}
+    if(conn){conn.textContent='❌ 失败';conn.style.color='var(--re)';}
+  }
+  if(btn){btn.disabled=false;btn.textContent='⚡ 连通性测试';}
+}
 
 
 window.addEventListener('load',()=>{initAllHistBadges();loadSettings();updateTS();setInterval(updateTS,60000);addEpisode_init();
