@@ -1,0 +1,18 @@
+{
+  "projects": [
+    {
+      "title": "测试",
+      "mode": "anime",
+      "style": "日式标准 (A-1/MAPPA Style)",
+      "genre": "仙侠玄幻",
+      "camBody": "",
+      "camLens": "",
+      "anamorphic": false,
+      "id": "proj_1780668361216_zyovn1",
+      "createdAt": 1780668361216,
+      "updatedAt": 1780668361216
+    }
+  ],
+  "projectData": {},
+  "savedAt": "2026-06-05T14:06:01.217Z"
+}
