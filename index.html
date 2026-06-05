@@ -1979,26 +1979,18 @@ function setSyncStatus(state, txt){
 async function loadFromGitHub(){
   setSyncStatus('syncing', 'LOADING...');
   try{
-    const url = `https://api.github.com/repos/${TEAM_CONFIG.github_repo}/contents/${TEAM_CONFIG.github_file}`;
-    const res = await fetch(url, {
-      headers: {
-        'Authorization': `token ${TEAM_CONFIG.github_token}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
+    // raw.githubusercontent.com 无跨域限制（仓库需公开）
+    const rawUrl = `https://raw.githubusercontent.com/${TEAM_CONFIG.github_repo}/main/${TEAM_CONFIG.github_file}?t=${Date.now()}`;
+    const res = await fetch(rawUrl);
     if(res.status === 404){
-      // 文件不存在，初始化空数据
       setSyncStatus('synced', 'NEW WORKSPACE');
       allProjects = [];
       renderProjectCards();
       return;
     }
     if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    const content = JSON.parse(atob(data.content.replace(/\n/g,'')));
-    // 恢复项目列表和数据
+    const content = await res.json();
     allProjects = content.projects || [];
-    // 恢复每个项目的worldData和episodes
     if(content.projectData){
       Object.keys(content.projectData).forEach(function(id){
         localStorage.setItem('tt_proj_data_'+id, JSON.stringify(content.projectData[id]));
@@ -2010,10 +2002,10 @@ async function loadFromGitHub(){
   }catch(e){
     console.error('[GitHub] 加载失败:', e);
     setSyncStatus('error', 'OFFLINE');
-    // 降级到本地数据
     initProjectList();
   }
 }
+
 
 async function saveToGitHub(){
   if(!sessionStorage.getItem('tt_auth')) return;
