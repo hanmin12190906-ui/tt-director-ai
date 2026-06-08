@@ -1532,6 +1532,7 @@ body {
   </div>
   <div class="sb-bot">
     <div class="vl"><span>TT DIRECTOR AI</span><span>v2.1</span></div>
+    <button class="bsm" onclick="manualSave()" style="background:rgba(224,32,32,.1);border-color:rgba(224,32,32,.3);color:var(--re)">💾 保存项目</button>
     <button class="bsm" onclick="saveAndExit()">← 退出项目</button>
     <button class="bsm bdan" onclick="localStorage.removeItem('tt_auth');location.reload()">安全登出</button>
   </div>
@@ -2139,6 +2140,18 @@ let currentProject=null;
 function updateTS(){const d=new Date();const el=document.getElementById('sb-ts');if(el)el.textContent='最后更新: '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0')+':'+d.getSeconds().toString().padStart(2,'0');}
 setInterval(updateTS,1000);updateTS();
 
+function manualSave(){
+  if(!currentProject||!currentProject.id){showToast('⚠️ 请先进入项目');return;}
+  currentProject.updatedAt = Date.now();
+  saveCurrentProjectData();
+  saveProjectList();
+  showToast('✅ 项目已保存');
+  // 更新侧边栏时间戳
+  var tsEl = document.getElementById('sb-ts');
+  if(tsEl) tsEl.textContent = '项目：' + currentProject.title + '  已保存 ' + new Date().toLocaleTimeString('zh');
+}
+
+
 function saveAndExit(){
   if(currentProject&&currentProject.id){
     currentProject.updatedAt=Date.now();
@@ -2317,6 +2330,9 @@ function enterProject(proj){
       worldData=data.worldData||{chars:[],scenes:[],items:[]};
       episodes=data.episodes||[{name:'第 1 集',shots:[]}];
       activeEpisode=data.activeEpisode||0;
+      console.log('[LOAD] 项目数据恢复: chars='+worldData.chars.length+' scenes='+worldData.scenes.length+' episodes='+episodes.length);
+    } else {
+      console.log('[LOAD] 无历史数据，新项目');
     }
   }
   // ★ 先跳转页面，再做其他操作
