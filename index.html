@@ -1935,6 +1935,7 @@ const TEAM_CONFIG = {
   cos_secret_key: ['Ujrrf','Fbpyw','rbBar','vmPp1BLSZ0KcnlU3O'].join(''),
   cos_file: 'team-data.json',
   cos_url: 'https://tt-director-data-1420722883.cos.ap-beijing.myqcloud.com',
+  cos_website: 'https://tt-director-data-1420722883.cos-website.ap-beijing.myqcloud.com',
 };
 
 // ══════════════════════════════════════════════
@@ -2013,7 +2014,11 @@ async function sha1(str){
 async function loadFromGitHub(){
   setSyncStatus('syncing', 'LOADING...');
   try{
-    const url = TEAM_CONFIG.cos_url + '/' + TEAM_CONFIG.cos_file + '?t=' + Date.now();
+    // 同源请求：网站和数据在同一个COS桶，用相对路径
+    const baseUrl = window.location.hostname.includes('cos-website') 
+      ? '' 
+      : TEAM_CONFIG.cos_url;
+    const url = baseUrl + '/' + TEAM_CONFIG.cos_file + '?t=' + Date.now();
     const res = await fetch(url);
     if(res.status === 404){
       setSyncStatus('synced', 'NEW WORKSPACE');
@@ -2055,7 +2060,11 @@ async function saveToGitHub(){
     // 生成腾讯云COS签名
     var auth = await getCOSPutAuth('/' + TEAM_CONFIG.cos_file);
 
-    var res = await fetch(TEAM_CONFIG.cos_url + '/' + TEAM_CONFIG.cos_file, {
+    var isSameOrigin = window.location.hostname.includes('cos-website');
+    var saveUrl = isSameOrigin 
+      ? '/' + TEAM_CONFIG.cos_file
+      : TEAM_CONFIG.cos_url + '/' + TEAM_CONFIG.cos_file;
+    var res = await fetch(saveUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -2272,11 +2281,18 @@ function createProject(){
       document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
       var worldNi=document.querySelector('.ni[onclick*="world"]');
       if(worldNi)worldNi.classList.add('active');
-      // 5. 数据初始化
+      // 5. 数据初始化（新项目空数据，已有项目加载历史）
       currentProject=proj;
-      worldData={chars:[],scenes:[],items:[]};
-      episodes=[{name:'第 1 集',shots:[]}];
-      activeEpisode=0;
+      var existingData = loadProjectData(proj.id);
+      if(existingData){
+        worldData = existingData.worldData || {chars:[],scenes:[],items:[]};
+        episodes = existingData.episodes || [{name:'第 1 集',shots:[]}];
+        activeEpisode = existingData.activeEpisode || 0;
+      } else {
+        worldData={chars:[],scenes:[],items:[]};
+        episodes=[{name:'第 1 集',shots:[]}];
+        activeEpisode=0;
+      }
       var tsEl=document.getElementById('sb-ts');
       if(tsEl)tsEl.textContent='项目：'+proj.title;
       try{selectWorldAsset('script',null,document.getElementById('wni-script'));}catch(e){console.warn(e);}
@@ -3188,9 +3204,9 @@ function deletePeriodImg(type,idx,pi,slot,ii){
 
 
 function togglePeriodCard(pi,type,idx){const data=type==='char'?worldData.chars:type==='scene'?worldData.scenes:worldData.items;if(data[idx]&&data[idx].periods[pi])data[idx].periods[pi]._collapsed=!data[idx].periods[pi]._collapsed;const cel=document.getElementById('wa-'+type+'-content');if(cel&&data[idx])cel.innerHTML=data[idx].periods.map((p,pi2)=>renderPeriodCard(p,pi2,type,idx)).join('');}
-function saveCharAsset(){if(activeWorldAsset===null||activeWorldAsset===undefined)return;const p=document.getElementById('char-prompt'),n=document.getElementById('char-notes');if(worldData.chars[activeWorldAsset]){if(p)worldData.chars[activeWorldAsset].prompt=p.value;if(n)worldData.chars[activeWorldAsset].notes=n.value;}showToast('✅ 角色资产已保存');refreshNavLists();}
-function saveSceneAsset(){if(activeWorldAsset===null||activeWorldAsset===undefined)return;const p=document.getElementById('scene-prompt'),m=document.getElementById('scene-mood'),l=document.getElementById('scene-light'),n=document.getElementById('scene-notes');if(worldData.scenes[activeWorldAsset]){if(p)worldData.scenes[activeWorldAsset].prompt=p.value;if(m)worldData.scenes[activeWorldAsset].mood=m.value;if(l)worldData.scenes[activeWorldAsset].light=l.value;if(n)worldData.scenes[activeWorldAsset].notes=n.value;}showToast('✅ 场景资产已保存');refreshNavLists();}
-function saveItemAsset(){if(activeWorldAsset===null||activeWorldAsset===undefined)return;const p=document.getElementById('item-prompt'),c=document.getElementById('item-category'),n=document.getElementById('item-notes');if(worldData.items[activeWorldAsset]){if(p)worldData.items[activeWorldAsset].prompt=p.value;if(c)worldData.items[activeWorldAsset].category=c.value;if(n)worldData.items[activeWorldAsset].notes=n.value;}showToast('✅ 物品资产已保存');refreshNavLists();}
+function saveCharAsset(){if(activeWorldAsset===null||activeWorldAsset===undefined)return;const p=document.getElementById('char-prompt'),n=document.getElementById('char-notes');if(worldData.chars[activeWorldAsset]){if(p)worldData.chars[activeWorldAsset].prompt=p.value;if(n)worldData.chars[activeWorldAsset].notes=n.value;}showToast('✅ 角色资产已保存');refreshNavLists();saveCurrentProjectData();}
+function saveSceneAsset(){if(activeWorldAsset===null||activeWorldAsset===undefined)return;const p=document.getElementById('scene-prompt'),m=document.getElementById('scene-mood'),l=document.getElementById('scene-light'),n=document.getElementById('scene-notes');if(worldData.scenes[activeWorldAsset]){if(p)worldData.scenes[activeWorldAsset].prompt=p.value;if(m)worldData.scenes[activeWorldAsset].mood=m.value;if(l)worldData.scenes[activeWorldAsset].light=l.value;if(n)worldData.scenes[activeWorldAsset].notes=n.value;}showToast('✅ 场景资产已保存');refreshNavLists();saveCurrentProjectData();}
+function saveItemAsset(){if(activeWorldAsset===null||activeWorldAsset===undefined)return;const p=document.getElementById('item-prompt'),c=document.getElementById('item-category'),n=document.getElementById('item-notes');if(worldData.items[activeWorldAsset]){if(p)worldData.items[activeWorldAsset].prompt=p.value;if(c)worldData.items[activeWorldAsset].category=c.value;if(n)worldData.items[activeWorldAsset].notes=n.value;}showToast('✅ 物品资产已保存');refreshNavLists();saveCurrentProjectData();}
 function deleteAsset(type){if(activeWorldAsset===null||activeWorldAsset===undefined)return;if(!confirm('删除该资产？'))return;const arr=type==='char'?worldData.chars:type==='scene'?worldData.scenes:worldData.items;arr.splice(activeWorldAsset,1);activeWorldAsset=null;activeWorldType=null;refreshNavLists();selectWorldAsset('script',null,document.getElementById('wni-script'));showToast('已删除');}
 function deleteWorldAsset(type,i){activeWorldAsset=i;activeWorldType=type;deleteAsset(type);}
 function resetWorld(){if(!confirm('清空所有世界观数据？'))return;worldData.chars=[];worldData.scenes=[];worldData.items=[];activeWorldAsset=null;activeWorldType=null;refreshNavLists();selectWorldAsset('script',null,document.getElementById('wni-script'));showToast('世界观已重置');}
