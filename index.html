@@ -1952,7 +1952,7 @@ function doLogin(){
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('sync-indicator').style.display = 'flex';
   // 从GitHub加载数据
-  loadFromGitHub();
+  initProjectList();
 }
 
 function checkAuth(){
@@ -1977,76 +1977,18 @@ function setSyncStatus(state, txt){
 }
 
 async function loadFromGitHub(){
-  setSyncStatus('syncing', 'LOADING...');
-  try{
-    // raw.githubusercontent.com 无跨域限制（仓库需公开）
-    const rawUrl = `https://raw.githubusercontent.com/${TEAM_CONFIG.github_repo}/main/${TEAM_CONFIG.github_file}?t=${Date.now()}`;
-    const res = await fetch(rawUrl);
-    if(res.status === 404){
-      setSyncStatus('synced', 'NEW WORKSPACE');
-      allProjects = [];
-      renderProjectCards();
-      return;
-    }
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const content = await res.json();
-    allProjects = content.projects || [];
-    if(content.projectData){
-      Object.keys(content.projectData).forEach(function(id){
-        localStorage.setItem('tt_proj_data_'+id, JSON.stringify(content.projectData[id]));
-      });
-    }
-    setSyncStatus('synced', 'SYNCED ✓');
-    renderProjectCards();
-    console.log('[GitHub] 加载成功，项目数:', allProjects.length);
-  }catch(e){
-    console.error('[GitHub] 加载失败:', e);
-    setSyncStatus('error', 'OFFLINE');
-    initProjectList();
-  }
+  // 从本地存储加载（腾讯云COS接入前的过渡版本）
+  setSyncStatus('synced', 'LOCAL');
+  initProjectList();
 }
-
 
 async function saveToGitHub(){
-  if(!sessionStorage.getItem('tt_auth')) return;
-  setSyncStatus('syncing', 'SAVING...');
-  try{
-    // 收集所有项目数据
-    const projectData = {};
-    allProjects.forEach(function(p){
-      const raw = localStorage.getItem('tt_proj_data_'+p.id);
-      if(raw) try{ projectData[p.id] = JSON.parse(raw); }catch(e){}
-    });
-    const content = { projects: allProjects, projectData: projectData, savedAt: new Date().toISOString() };
-    const contentStr = JSON.stringify(content, null, 2);
-    const encoded = btoa(unescape(encodeURIComponent(contentStr)));
-
-    // 先获取文件SHA（更新文件需要）
-    const url = `https://api.github.com/repos/${TEAM_CONFIG.github_repo}/contents/${TEAM_CONFIG.github_file}`;
-    let sha = null;
-    try{
-      const getRes = await fetch(url, { headers: { 'Authorization': `token ${TEAM_CONFIG.github_token}`, 'Accept': 'application/vnd.github.v3+json' }});
-      if(getRes.ok){ const d = await getRes.json(); sha = d.sha; }
-    }catch(e){}
-
-    const body = { message: '🔄 TT Director AI 项目同步 ' + new Date().toLocaleString('zh'), content: encoded };
-    if(sha) body.sha = sha;
-
-    const putRes = await fetch(url, {
-      method: 'PUT',
-      headers: { 'Authorization': `token ${TEAM_CONFIG.github_token}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-      body: JSON.stringify(body)
-    });
-    if(!putRes.ok) throw new Error('HTTP '+putRes.status);
-    setSyncStatus('synced', 'SAVED ✓');
-    setTimeout(()=>setSyncStatus('synced','SYNCED ✓'), 2000);
-    console.log('[GitHub] 保存成功');
-  }catch(e){
-    console.error('[GitHub] 保存失败:', e);
-    setSyncStatus('error', 'SAVE FAILED');
-    setTimeout(()=>setSyncStatus('','READY'), 3000);
-  }
+  // 保存到本地存储
+  saveProjectList();
+  setSyncStatus('synced', 'SAVED ✓');
+  setTimeout(function(){setSyncStatus('synced','LOCAL');}, 1500);
 }
+
 
 // ══════════════════════════════════════════════
 // 覆盖原有的保存函数，同时同步到GitHub
@@ -2742,7 +2684,7 @@ window.addEventListener('load',()=>{initAllHistBadges();loadSettings();updateTS(
 if(!checkAuth()){
   // 未登录 - 等待登录
 } else {
-  loadFromGitHub();
+  initProjectList();
 }
 // Drag-and-drop for right panel gallery zones
 document.addEventListener('dragover',function(e){
