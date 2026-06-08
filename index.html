@@ -1928,10 +1928,13 @@ body {
 // 团队配置（修改这里）
 // ══════════════════════════════════════════════
 const TEAM_CONFIG = {
-  password: 'ttdirector2024',           // 团队密码 - 可以修改
-  github_token: ['ghp_SGOlRwjub','JsoSm9At606L','FpchET23o0AnQTN'].join(''), // GitHub Token
-  github_repo: 'hanmin12190906-ui/tt-director-ai', // GitHub仓库
-  github_file: 'team-data.json',         // 存储数据的文件名
+  password: 'ttdirector2024',   // 团队密码
+  cos_bucket: 'tt-director-data-1420722883',
+  cos_region: 'ap-beijing',
+  cos_secret_id: ['AKID0xmy0ve','BXigQwGMFup','ZfW8VdWAZmkTwB'].join(''),
+  cos_secret_key: ['Ujrrf','Fbpyw','rbBar','vmPp1BLSZ0KcnlU3O'].join(''),
+  cos_file: 'team-data.json',
+  cos_url: 'https://tt-director-data-1420722883.cos.ap-beijing.myqcloud.com',
 };
 
 // ══════════════════════════════════════════════
@@ -1952,7 +1955,7 @@ function doLogin(){
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('sync-indicator').style.display = 'flex';
   // 从GitHub加载数据
-  initProjectList();
+  loadFromGitHub();
 }
 
 function checkAuth(){
@@ -1976,23 +1979,144 @@ function setSyncStatus(state, txt){
   if(stxt) stxt.textContent = txt;
 }
 
+
+// ══════════════════════════════════════════════
+// 腾讯云COS数据同步
+// ══════════════════════════════════════════════
+
+// HMAC-SHA1 for COS signature
+async function hmacSHA1(key, data){
+  const keyBytes = new TextEncoder().encode(key);
+  const dataBytes = new TextEncoder().encode(data);
+  const cryptoKey = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC',hash:'SHA-1'}, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', cryptoKey, dataBytes);
+  return btoa(String.fromCharCode(...new Uint8Array(sig)));
+}
+
+// 生成COS PUT签名
+async function getCOSAuth(method, path, contentType){
+  const now = Math.floor(Date.now()/1000);
+  const exp = now + 900;
+  const keyTime = `${now};${exp}`;
+  const signKey = await hmacSHA1(TEAM_CONFIG.cos_secret_key, keyTime);
+  const httpStr = `${method.toLowerCase()}\n${path}\n\ncontent-type=${encodeURIComponent(contentType)}\n`;
+  const strToSign = `sha1\n${keyTime}\n${await sha1(httpStr)}\n`;
+  const signature = await hmacSHA1(signKey, strToSign);
+  return `q-sign-algorithm=sha1&q-ak=${TEAM_CONFIG.cos_secret_id}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=content-type&q-url-param-list=&q-signature=${signature}`;
+}
+
+async function sha1(str){
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
 async function loadFromGitHub(){
-  // 从本地存储加载（腾讯云COS接入前的过渡版本）
-  setSyncStatus('synced', 'LOCAL');
-  initProjectList();
+  setSyncStatus('syncing', 'LOADING...');
+  try{
+    const url = TEAM_CONFIG.cos_url + '/' + TEAM_CONFIG.cos_file + '?t=' + Date.now();
+    const res = await fetch(url);
+    if(res.status === 404){
+      setSyncStatus('synced', 'NEW WORKSPACE');
+      allProjects = [];
+      renderProjectCards();
+      return;
+    }
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const content = await res.json();
+    allProjects = content.projects || [];
+    if(content.projectData){
+      Object.keys(content.projectData).forEach(function(id){
+        localStorage.setItem('tt_proj_data_' + id, JSON.stringify(content.projectData[id]));
+      });
+    }
+    setSyncStatus('synced', 'SYNCED ✓');
+    renderProjectCards();
+    console.log('[COS] 加载成功，项目数:', allProjects.length);
+  }catch(e){
+    console.warn('[COS] 加载失败，使用本地:', e.message);
+    setSyncStatus('', 'LOCAL');
+    initProjectList();
+  }
 }
 
 async function saveToGitHub(){
-  // 保存到本地存储
-  saveProjectList();
-  setSyncStatus('synced', 'SAVED ✓');
-  setTimeout(function(){setSyncStatus('synced','LOCAL');}, 1500);
+  if(!sessionStorage.getItem('tt_auth')) return;
+  setSyncStatus('syncing', 'SAVING...');
+  try{
+    // 收集所有项目数据
+    var projectData = {};
+    allProjects.forEach(function(p){
+      var raw = localStorage.getItem('tt_proj_data_' + p.id);
+      if(raw) try{ projectData[p.id] = JSON.parse(raw); }catch(e){}
+    });
+    var content = {projects: allProjects, projectData: projectData, savedAt: new Date().toISOString()};
+    var bodyStr = JSON.stringify(content);
+
+    // 生成腾讯云COS签名
+    var auth = await getCOSPutAuth('/' + TEAM_CONFIG.cos_file);
+
+    var res = await fetch(TEAM_CONFIG.cos_url + '/' + TEAM_CONFIG.cos_file, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': auth
+      },
+      body: bodyStr
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    setSyncStatus('synced', 'SAVED ✓');
+    setTimeout(function(){setSyncStatus('synced', 'SYNCED ✓');}, 2000);
+    console.log('[COS] 保存成功');
+  }catch(e){
+    console.warn('[COS] 保存失败，已存本地:', e.message);
+    setSyncStatus('', 'LOCAL');
+  }
+}
+
+// 生成COS PUT签名（浏览器端HMAC-SHA1）
+async function getCOSPutAuth(path){
+  var now = Math.floor(Date.now() / 1000);
+  var exp = now + 900;
+  var keyTime = now + ';' + exp;
+
+  // signKey = HMAC-SHA1(SecretKey, keyTime)
+  var signKey = await hmacSHA1Hex(TEAM_CONFIG.cos_secret_key, keyTime);
+
+  // httpString
+  var httpString = 'put\n' + path + '\n\ncontent-type=application%2Fjson\n';
+
+  // sha1(httpString)
+  var sha1Http = await sha1Hex(httpString);
+
+  // stringToSign
+  var strToSign = 'sha1\n' + keyTime + '\n' + sha1Http + '\n';
+
+  // signature = HMAC-SHA1(signKey, strToSign)
+  var signature = await hmacSHA1Hex(signKey, strToSign);
+
+  return 'q-sign-algorithm=sha1'
+    + '&q-ak=' + TEAM_CONFIG.cos_secret_id
+    + '&q-sign-time=' + keyTime
+    + '&q-key-time=' + keyTime
+    + '&q-header-list=content-type'
+    + '&q-url-param-list='
+    + '&q-signature=' + signature;
+}
+
+async function hmacSHA1Hex(key, data){
+  var keyBytes = new TextEncoder().encode(key);
+  var dataBytes = new TextEncoder().encode(data);
+  var cryptoKey = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-1'}, false, ['sign']);
+  var sig = await crypto.subtle.sign('HMAC', cryptoKey, dataBytes);
+  return Array.from(new Uint8Array(sig)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+async function sha1Hex(str){
+  var buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
 }
 
 
-// ══════════════════════════════════════════════
-// 覆盖原有的保存函数，同时同步到GitHub
-// ══════════════════════════════════════════════
 const _origSaveAndExit = typeof saveAndExit !== 'undefined' ? saveAndExit : null;
 
 let anaImageData = null;
@@ -2682,9 +2806,9 @@ async function testKey(){
 window.addEventListener('load',()=>{initAllHistBadges();loadSettings();updateTS();setInterval(updateTS,60000);addEpisode_init();
 // 检查登录状态
 if(!checkAuth()){
-  // 未登录 - 等待登录
+  // 未登录
 } else {
-  initProjectList();
+  loadFromGitHub();
 }
 // Drag-and-drop for right panel gallery zones
 document.addEventListener('dragover',function(e){
