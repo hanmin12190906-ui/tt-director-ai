@@ -1533,7 +1533,7 @@ body {
   <div class="sb-bot">
     <div class="vl"><span>TT DIRECTOR AI</span><span>v2.1</span></div>
     <button class="bsm" onclick="saveAndExit()">← 退出项目</button>
-    <button class="bsm bdan">安全登出</button>
+    <button class="bsm bdan" onclick="localStorage.removeItem('tt_auth');location.reload()">安全登出</button>
   </div>
 </div>
 <div class="main">
@@ -1952,7 +1952,7 @@ function doLogin(){
     return;
   }
   // 密码正确
-  sessionStorage.setItem('tt_auth', '1');
+  localStorage.setItem('tt_auth', '1');
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('sync-indicator').style.display = 'flex';
   // 从GitHub加载数据
@@ -1960,9 +1960,11 @@ function doLogin(){
 }
 
 function checkAuth(){
-  if(sessionStorage.getItem('tt_auth') === '1'){
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('sync-indicator').style.display = 'flex';
+  if(localStorage.getItem('tt_auth') === '1'){
+    var ls = document.getElementById('login-screen');
+    var si = document.getElementById('sync-indicator');
+    if(ls) ls.style.display = 'none';
+    if(si) si.style.display = 'flex';
     return true;
   }
   document.getElementById('sync-indicator').style.display = 'none';
@@ -2045,7 +2047,7 @@ async function loadFromGitHub(){
 }
 
 async function saveToGitHub(){
-  if(!sessionStorage.getItem('tt_auth')) return;
+  if(!localStorage.getItem('tt_auth')) return;
   setSyncStatus('syncing', 'SAVING...');
   try{
     // 收集所有项目数据
