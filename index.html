@@ -2724,7 +2724,35 @@ async function doDirectorAnalysis(selectedAssets){
   const userPrompt=projInfo+assetConstraints+'\n\n【终极制片任务】\n请将以下剧本切分为完美的 '+shotCount+' 个连贯分镜（总时长控在约 '+totalSec+' 秒）。\n\n⚠️【visual字段严格要求】每个镜头的visual必须100-200字，包含：①整体美术风格定调 ②场景环境完整描述（空间感/光线/氛围/材质）③主要人物具体位置与状态（位置/姿态/服装） ④关键视觉元素（道具/特效/光效）⑤整体情绪氛围。绝对禁止只写一两句话。\nfg字段：前景主要视觉元素简洁描述2-3句。bg字段：背景空间感及关键环境元素2-3句。\n\n必须严格按照JSON格式返回。不要任何Markdown包裹符，首字符必须是[数组起始符。\n\n【本集剧本内容】\n'+script.substring(0,4000);
   const result=await callClaude('director',userPrompt);
   dirAnalysisRunning=false;if(btn){btn.disabled=false;btn.textContent='🚀 启动智能分镜分析';}if(progress)progress.style.display='none';
-  if(result){try{let clean=result.trim().replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();const fb=clean.indexOf('['),lb=clean.lastIndexOf(']');if(fb>=0&&lb>fb)clean=clean.substring(fb,lb+1);const shots=JSON.parse(clean);episodes[activeEpisode].shots=Array.isArray(shots)?shots:[];renderEpisodeList();renderShots();showToast('✅ 生成 '+episodes[activeEpisode].shots.length+' 个镜头');saveHistory('director',{script:script.substring(0,500),shotCount:episodes[activeEpisode].shots.length,shots:episodes[activeEpisode].shots,preview:script.substring(0,100)});}catch(e){showToast('分镜解析失败');const c2=document.getElementById('dir-shots');if(c2)c2.innerHTML='<div class="result-card" style="margin:20px"><div class="rc-content">'+esc(result)+'</div></div>';}}
+  if(result){try{
+    let clean=result.trim()
+      .replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+    // 提取 [ ] 之间的内容
+    const fb=clean.indexOf('['),lb=clean.lastIndexOf(']');
+    if(fb>=0&&lb>fb)clean=clean.substring(fb,lb+1);
+    // 修复常见JSON问题
+    clean=clean.replace(/,\s*([}\]])/g,'$1');
+    let shots;
+    try{
+      shots=JSON.parse(clean);
+    }catch(e1){
+      // 尝试逐个提取 {} 对象
+      const objMatches=clean.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g)||[];
+      shots=objMatches.map(s=>{try{return JSON.parse(s);}catch(e){return null;}}).filter(Boolean);
+      if(!shots.length) throw new Error('无法解析JSON: '+e1.message);
+    }
+    episodes[activeEpisode].shots=Array.isArray(shots)?shots:[];
+    renderEpisodeList();renderShots();
+    saveCurrentProjectData();
+    showToast('✅ 生成 '+episodes[activeEpisode].shots.length+' 个镜头');
+    saveHistory('director',{script:script.substring(0,500),shotCount:episodes[activeEpisode].shots.length,shots:episodes[activeEpisode].shots,preview:script.substring(0,100)});
+  }catch(e){
+    console.error('分镜解析失败:',e,result.substring(0,200));
+    showToast('⚠️ 解析失败，请重试（AI输出格式异常）');
+    const c2=document.getElementById('dir-shots');
+    if(c2)c2.innerHTML='<div style="padding:20px;color:var(--re);font-size:12px;font-family:var(--font-mono)">解析失败：'+esc(e.message)+'<br><br><span style="color:var(--t3);font-size:11px">AI原始输出（前300字）：</span><br>'+esc(result.substring(0,300))+'</div>';
+  }
+}
 }
 
 function showStoryboardPreview(epIdx){const ep=episodes[typeof epIdx!=='undefined'?epIdx:activeEpisode];if(!ep||!ep.shots||!ep.shots.length){showToast('该集暂无分镜数据');return;}const projTitle=currentProject?currentProject.title:'未命名项目';const epName=ep.name||'第1集';const shotRows=ep.shots.map((sh,i)=>`<tr><td>${i+1}</td><td>${sh.scene||'—'}</td><td>${sh.location||'—'}</td><td>${sh.duration||'—'}</td><td>${sh.shot_type||'—'}</td><td>${sh.composition||'—'}</td><td>${sh.lighting||'—'}</td><td style="min-width:200px">${sh.visual||'—'}</td><td>${sh.action||'—'}</td><td>${sh.dialogue&&sh.dialogue!='（无）'?'<b>'+sh.dialogue+'</b>':'—'}</td><td>${sh.sound||'—'}</td></tr>`).join('');const html='<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><title>'+epName+' - 分镜脚本表</title><style>body{font-family:sans-serif;background:#0a0a14;color:#e0e0f0;margin:0;padding:20px}table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #333;padding:6px 8px;vertical-align:top}th{background:#1a1a2e;color:#a0a0c0;text-align:center}tr:nth-child(even){background:rgba(255,255,255,.02)}</style></head><body><div style="margin-bottom:20px"><div style="font-size:20px;font-weight:700">'+epName+' - 分镜脚本表</div><div style="font-size:11px;color:#666;margin-top:4px">'+projTitle+'</div></div><table><thead><tr><th>镜号</th><th>场景</th><th>地点</th><th>时长</th><th>景别</th><th>构图</th><th>光影</th><th style="min-width:220px">画面描述</th><th>动作描写</th><th>台词内容</th><th>音效设计</th></tr></thead><tbody>'+shotRows+'</tbody></table></body></html>';const win=window.open('','_blank','width=1400,height=900,scrollbars=yes');if(!win){showToast('请允许弹出窗口');return;}win.document.write(html);win.document.close();}
