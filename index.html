@@ -2018,20 +2018,9 @@ async function sha1(str){
 async function loadFromGitHub(){
   setSyncStatus('syncing', 'LOADING...');
   try{
-    // 同源请求：网站和数据在同一个COS桶，用相对路径
-    const baseUrl = window.location.hostname.includes('cos-website') 
-      ? '' 
-      : TEAM_CONFIG.cos_url;
-    const url = baseUrl + '/' + TEAM_CONFIG.cos_file + '?t=' + Date.now();
-    const res = await fetch(url);
-    if(res.status === 404){
-      setSyncStatus('synced', 'NEW WORKSPACE');
-      allProjects = [];
-      renderProjectCards();
-      return;
-    }
+    var res = await fetch(TEAM_CONFIG.api_url + '/data?t=' + Date.now());
     if(!res.ok) throw new Error('HTTP ' + res.status);
-    const content = await res.json();
+    var content = await res.json();
     allProjects = content.projects || [];
     if(content.projectData){
       Object.keys(content.projectData).forEach(function(id){
@@ -2040,9 +2029,9 @@ async function loadFromGitHub(){
     }
     setSyncStatus('synced', 'SYNCED ✓');
     renderProjectCards();
-    console.log('[COS] 加载成功，项目数:', allProjects.length);
+    console.log('[API] 加载成功，项目数:', allProjects.length);
   }catch(e){
-    console.warn('[COS] 加载失败，使用本地:', e.message);
+    console.warn('[API] 加载失败，使用本地:', e.message);
     setSyncStatus('', 'LOCAL');
     initProjectList();
   }
