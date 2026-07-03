@@ -2703,6 +2703,2711 @@ async function runAnalyzer(){
       return groups.map(function(g, gi){
         var titleM = g.match(/【第(\d+)[^】]*】/);
         var title = titleM ? titleM[0].replace(/【|】/g,'') : '第'+(gi+1)+'组';
+        var content = g.replace(/^-+-[\s\S]*?-+-\n/,'').replace(/-+-\s*$/,'').trim();E html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TT Director AI — 短视频导演创作平台</title>
+<meta name="version" content="v2.1-fix">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ── 纯黑电影级色板 ── */
+  --bg:     #080808;
+  --panel:  #0e0e0e;
+  --card:   #131313;
+  --card2:  #1a1a1a;
+  --b1:     rgba(255,255,255,0.06);
+  --b2:     rgba(255,255,255,0.10);
+
+  /* 文字层级 */
+  --t1: #f0f0f0;
+  --t2: #888;
+  --t3: #444;
+
+  /* 红色主高亮 */
+  --re:  #e02020;
+  --re2: #ff3333;
+  --re3: rgba(224,32,32,0.15);
+
+  /* 功能色（降饱和，配合黑底） */
+  --pu:  #8866ff;
+  --pu2: #aa99ff;
+  --bl:  #3399ff;
+  --cy:  #00ccbb;
+  --or:  #ff7722;
+  --gr:  #33cc66;
+  --pk:  #dd44aa;
+  --ye:  #ddaa00;
+
+  /* 字体 */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--t1);
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(224,32,32,0.4); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--re); }
+* { scrollbar-width: thin; scrollbar-color: rgba(224,32,32,0.35) transparent; }
+
+/* ══ SIDEBAR ══ */
+.sb {
+  width: 220px;
+  min-width: 220px;
+  background: var(--panel);
+  border-right: 1px solid var(--b1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 10;
+}
+
+/* 顶部红线装饰 */
+.sb::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--re);
+}
+
+.sb-logo {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid var(--b1);
+}
+
+.logo-txt {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--t1);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.logo-txt .logo-dot {
+  color: var(--re);
+}
+
+.logo-sub {
+  font-size: 9px;
+  color: var(--t3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.sb-ts {
+  padding: 10px 20px;
+  font-size: 10px;
+  color: var(--t3);
+  font-family: var(--font-mono);
+  letter-spacing: .5px;
+  border-bottom: 1px solid var(--b1);
+}
+
+.sb-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 0;
+}
+
+.sb-sec {
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--t3);
+  padding: 18px 20px 8px;
+  font-family: var(--font-mono);
+}
+
+.ni {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 20px;
+  cursor: pointer;
+  color: var(--t2);
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 1.5px;
+  transition: all .15s;
+  position: relative;
+  line-height: 1;
+}
+
+.ni:hover {
+  color: var(--t1);
+  background: rgba(255,255,255,0.03);
+}
+
+.ni.active {
+  color: var(--t1);
+  background: rgba(224,32,32,0.08);
+}
+
+.ni.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--re);
+}
+
+.ni-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--t3);
+  transition: color .15s;
+}
+.ni:hover .ni-icon { color: var(--t2); }
+.ni.active .ni-icon { color: var(--re); }
+
+.ni.active .ni-icon { opacity: 1; }
+
+.nbadge {
+  margin-left: auto;
+  font-size: 8px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  font-family: var(--font-mono);
+}
+.bnew { background: rgba(224,32,32,0.2); color: var(--re2); }
+
+.sb-bot {
+  border-top: 1px solid var(--b1);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vl {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--t3);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+/* ══ MAIN AREA ══ */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ══ PAGES ══ */
+.page {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.page.active-page, .page.fi.active-page { display: flex !important; }
+
+/* ══ PAGE HEADER (th) ══ */
+.th {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--b1);
+  flex-shrink: 0;
+  background: var(--panel);
+  position: relative;
+}
+
+.th-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.th-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: var(--t1);
+  line-height: 1;
+}
+
+.th-sub {
+  font-size: 9px;
+  color: var(--t3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 3px;
+  font-family: var(--font-mono);
+}
+
+/* ══ PROJECT CENTER ══ */
+.pc-hero {
+  padding: 60px 60px 40px;
+  background: var(--bg);
+}
+
+.pc-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--re);
+  margin-bottom: 16px;
+}
+
+.pc-headline {
+  font-family: var(--font-display);
+  font-size: 56px;
+  letter-spacing: 4px;
+  line-height: .95;
+  color: var(--t1);
+  margin-bottom: 8px;
+}
+
+.pc-headline span { color: var(--re); }
+
+.pc-subline {
+  font-size: 13px;
+  color: var(--t3);
+  letter-spacing: 1px;
+}
+
+.pc-create {
+  padding: 0 60px 40px;
+}
+
+.pc-create-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 32px;
+  background: var(--re);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.pc-create-btn:hover {
+  background: var(--re2);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(224,32,32,0.3);
+}
+
+.pc-divider {
+  height: 1px;
+  background: var(--b1);
+  margin: 0 60px 40px;
+  position: relative;
+}
+
+.pc-divider::after {
+  content: 'PROJECTS';
+  position: absolute;
+  top: -9px;
+  left: 0;
+  background: var(--bg);
+  padding-right: 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--t3);
+}
+
+.pc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 0 60px 60px;
+  overflow-y: auto;
+}
+
+.pc-card {
+  background: var(--card);
+  border: 1px solid var(--b1);
+  border-radius: 6px;
+  padding: 28px;
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.pc-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: transparent;
+  transition: background .2s;
+}
+
+.pc-card:hover {
+  border-color: rgba(224,32,32,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+
+.pc-card:hover::before { background: var(--re); }
+
+.ct {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  margin-bottom: 14px;
+}
+
+.t-an { background:rgba(136,102,255,.15); color:#aa99ff; }
+.t-mo { background:rgba(51,153,255,.15); color:#3399ff; }
+.t-dr { background:rgba(224,32,32,.15); color:#ff6666; }
+.t-tv { background:rgba(221,170,0,.15); color:#ddaa00; }
+
+.pc-ti {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  color: var(--t1);
+  line-height: 1.1;
+}
+
+.pc-meta {
+  font-size: 11px;
+  color: var(--t3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  letter-spacing: .5px;
+  margin-bottom: 20px;
+}
+
+.pc-meta span::after { content: '·'; margin-left: 8px; }
+.pc-meta span:last-child::after { content: ''; }
+
+.pc-bar-wrap { height: 2px; background: var(--b1); border-radius: 1px; }
+.pc-bar { height: 2px; background: var(--re); border-radius: 1px; transition: width .3s; }
+
+/* ══ TOP BAR (project context) ══ */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  height: 44px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--b1);
+  flex-shrink: 0;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.tb-tag {
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.tb-sep { color: var(--t3); }
+.tb-cam { color: var(--re); border: 1px solid rgba(224,32,32,0.3); padding: 3px 10px; border-radius: 3px; }
+.tb-lens { color: var(--bl); border: 1px solid rgba(51,153,255,0.25); padding: 3px 10px; border-radius: 3px; }
+
+/* ══ SPLIT LAYOUT ══ */
+.split { display: flex; flex: 1; overflow: hidden; }
+.split-l { width: 360px; min-width: 320px; border-right: 1px solid var(--b1); display: flex; flex-direction: column; overflow: hidden; }
+.split-r { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* ══ CONTENT BLOCKS ══ */
+.iblock { padding: 20px 24px; border-bottom: 1px solid var(--b1); }
+.ilabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 10px;
+}
+.ilabel.hl { color: var(--re); }
+
+/* ══ INPUTS ══ */
+.ita, .inp, .isel, .finp {
+  background: var(--card2);
+  border: 1px solid var(--b1);
+  border-radius: 4px;
+  color: var(--t1);
+  font-family: var(--font-body);
+  font-size: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  transition: border-color .15s;
+  outline: none;
+  resize: none;
+}
+
+.ita:focus, .inp:focus, .isel:focus, .finp:focus {
+  border-color: rgba(224,32,32,0.4);
+  background: #1a1a1a;
+}
+
+.ita::placeholder, .inp::placeholder, .finp::placeholder { color: var(--t3); }
+.isel option { background: var(--card); }
+
+/* ══ BUTTONS ══ */
+.big-btn {
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 2px;
+  padding: 13px 28px;
+  transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.big-re {
+  background: var(--re);
+  color: #fff;
+}
+.big-re:hover {
+  background: var(--re2);
+  box-shadow: 0 6px 24px rgba(224,32,32,0.35);
+  transform: translateY(-1px);
+}
+
+.big-pu {
+  background: rgba(136,102,255,0.15);
+  color: var(--pu2);
+  border: 1px solid rgba(136,102,255,0.3);
+}
+.big-pu:hover { background: rgba(136,102,255,0.25); }
+
+.big-pk {
+  background: linear-gradient(135deg, #7c3aed, var(--re));
+  color: #fff;
+}
+.big-pk:hover { filter: brightness(1.1); box-shadow: 0 6px 24px rgba(224,32,32,0.3); }
+
+.bpo {
+  background: transparent;
+  border: 1px solid var(--b2);
+  color: var(--t2);
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-body);
+}
+.bpo:hover { border-color: var(--re); color: var(--re); }
+
+.bpr {
+  background: var(--re);
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-body);
+}
+.bpr:hover { background: var(--re2); }
+
+.bsm {
+  background: transparent;
+  border: 1px solid var(--b1);
+  color: var(--t2);
+  border-radius: 4px;
+  padding: 7px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-body);
+  width: 100%;
+}
+.bsm:hover { border-color: var(--b2); color: var(--t1); }
+.bdan { border-color: rgba(224,32,32,0.2); color: rgba(224,32,32,0.6); }
+.bdan:hover { border-color: var(--re); color: var(--re); }
+
+/* ══ RESULT PANEL ══ */
+.sr-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--b1);
+  background: var(--panel);
+  flex-shrink: 0;
+}
+
+.sr-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: var(--t1);
+}
+.sr-title span { color: var(--t3); font-size: 10px; font-family: var(--font-mono); letter-spacing: 1px; }
+
+.sr-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.sr-cols {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.ana-col {
+  flex: 1;
+  border-right: 1px solid var(--b1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.ana-col:last-child { border-right: none; }
+
+.ana-col-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--b1);
+  background: var(--panel);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+/* ══ WAITING STATE ══ */
+.waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  color: var(--t3);
+}
+.w-icon { font-size: 48px; opacity: .15; }
+.w-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  opacity: .4;
+}
+
+/* ══ IMG ZONE ══ */
+.img-zone {
+  border: 1px dashed rgba(255,255,255,0.1);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all .2s;
+  color: var(--t3);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.img-zone:hover {
+  border-color: rgba(224,32,32,0.35);
+  background: rgba(224,32,32,0.03);
+}
+.iz-lbl { font-size: 11px; font-family: var(--font-mono); letter-spacing: 1px; }
+.iz-sub { font-size: 10px; }
+.preview { max-width:100%; max-height:100%; object-fit:contain; border-radius:4px; }
+
+/* ══ GALLERY ══ */
+.gallery-zone {
+  border: 1px dashed rgba(255,255,255,0.08);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all .2s;
+  color: var(--t3);
+  padding: 12px;
+  min-height: 70px;
+}
+.gallery-zone:hover { border-color: rgba(224,32,32,0.3); }
+
+/* ══ ARCHIVE CARDS ══ */
+.archive-card {
+  background: var(--card);
+  border: 1px solid var(--b1);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.archive-card:hover { border-color: var(--b2); }
+.archive-card-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 10px;
+  border-bottom: 1px solid var(--b1);
+}
+.archive-card-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 1px;
+  color: var(--t1);
+}
+
+/* ══ FORM ══ */
+.flabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--t3);
+  display: block;
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+.flabel .hl { color: var(--re); margin-right: 6px; }
+
+/* ══ HIST BTN ══ */
+.hist-btn {
+  background: transparent;
+  border: 1px solid var(--b1);
+  color: var(--t2);
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 10px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  transition: all .15s;
+}
+.hist-btn:hover { border-color: var(--re); color: var(--re); }
+
+/* ══ COPY BTN ══ */
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--b1);
+  color: var(--t2);
+  border-radius: 3px;
+  padding: 3px 10px;
+  font-size: 10px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: all .15s;
+}
+.copy-btn:hover { border-color: var(--re); color: var(--re); }
+
+/* ══ TYPING DOTS ══ */
+.typing-dots { display:flex; gap:4px; align-items:center; }
+.dot {
+  width:5px; height:5px; border-radius:50%;
+  background:var(--re);
+  animation: pulse 1.2s infinite;
+}
+.dot:nth-child(2) { animation-delay:.2s; }
+.dot:nth-child(3) { animation-delay:.4s; }
+@keyframes pulse { 0%,80%,100%{opacity:.2;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+
+/* ══ DRAG-OVER ══ */
+[data-paste-target]:hover { background:rgba(224,32,32,.04)!important; border-color:rgba(224,32,32,.4)!important; cursor:pointer; }
+[data-paste-target].drag-over { background:rgba(224,32,32,.08)!important; border-color:var(--re)!important; }
+
+/* ══ WORLD BUILD PANELS ══ */
+.wni {
+  display:flex; align-items:center; gap:8px;
+  padding:7px 12px; cursor:pointer; border-radius:5px;
+  font-size:12px; color:var(--t2); transition:all .15s;
+}
+.wni:hover { background:rgba(255,255,255,.03); color:var(--t1); }
+.wni.active { background:rgba(224,32,32,.08); color:var(--t1); }
+.wni-section { margin-bottom:8px; }
+
+.wd-panel,.wa-panel { display:none; }
+.wd-panel,.wa-panel { flex-direction:column; flex:1; overflow:hidden; }
+
+/* ══ SETTINGS ══ */
+.sg { background:var(--card); border:1px solid var(--b1); border-radius:6px; padding:20px 24px; margin-bottom:14px; }
+.sg-title { font-family:var(--font-display); font-size:17px; letter-spacing:2px; color:var(--re); margin-bottom:4px; }
+.sg-sub { font-size:10px; color:var(--t3); font-family:var(--font-mono); letter-spacing:1px; margin-bottom:16px; }
+.finp { padding:10px 14px; }
+
+/* ══ PROJECT FORM ══ */
+.pf-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.85);
+  display:flex; align-items:center; justify-content:center;
+  z-index:1000;
+  backdrop-filter:blur(4px);
+}
+.pf-box {
+  background:var(--panel);
+  border:1px solid var(--b1);
+  border-radius:8px;
+  width:520px;
+  max-height:85vh;
+  overflow-y:auto;
+  position:relative;
+}
+.pf-box::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:var(--re);
+  border-radius:8px 8px 0 0;
+}
+.pf-head {
+  padding:28px 28px 20px;
+  border-bottom:1px solid var(--b1);
+}
+.pf-title {
+  font-family:var(--font-display);
+  font-size:24px;
+  letter-spacing:3px;
+  color:var(--t1);
+}
+.pf-body { padding:20px 28px 28px; }
+
+/* ══ MODAL ══ */
+.modal-bg {
+  position:fixed;inset:0;background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;
+  z-index:999;backdrop-filter:blur(4px);
+}
+.modal-box {
+  background:var(--panel);
+  border:1px solid var(--b1);
+  border-radius:8px;
+  padding:28px;
+  max-width:480px;width:90%;
+}
+
+/* ══ TOPBAR TAGS ══ */
+.tb-mode-tag {
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:3px 8px;
+  border-radius:3px;
+}
+
+/* ══ PAGE TRANSITION ══ */
+.page { animation: fadeIn .15s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+/* ══ RESPONSIVE SCROLLABLE AREAS ══ */
+.fi { flex:1; flex-direction:column; overflow:hidden; }
+
+/* ══ SD TABS ══ */
+#sd-tab-char, #sd-tab-scene, #sd-tab-item {
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+/* ══ NEW PROJECT MODAL ══ */
+.mo {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.88);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.mo.active { display: flex; }
+.mo-box {
+  background: var(--panel);
+  border: 1px solid var(--b1);
+  border-radius: 8px;
+  width: 540px;
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 32px;
+  position: relative;
+}
+.mo-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--re);
+  border-radius: 8px 8px 0 0;
+}
+.mo-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  letter-spacing: 3px;
+  color: var(--t1);
+  margin-bottom: 24px;
+}
+
+/* toggle switch */
+.tog { display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--t2); }
+.tog-sw { width:36px;height:20px;background:var(--card2);border-radius:10px;position:relative;transition:background .2s;border:1px solid var(--b1); }
+.tog-sw::after { content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;background:var(--t3);border-radius:50%;transition:all .2s; }
+.tog.on .tog-sw,.tog.on-cy .tog-sw { background:rgba(224,32,32,.3);border-color:rgba(224,32,32,.4); }
+.tog.on .tog-sw::after,.tog.on-cy .tog-sw::after { left:18px;background:var(--re); }
+.tog.on-cy .tog-sw { background:rgba(0,204,187,.2); }
+.tog.on-cy .tog-sw::after { background:var(--cy); }
+
+/* select pills */
+.mode-pills,.genre-pills,.style-pills { display:flex;flex-wrap:wrap;gap:6px;margin-top:8px; }
+.pill {
+  padding:6px 14px;
+  border:1px solid var(--b1);
+  border-radius:4px;
+  cursor:pointer;
+  font-size:11px;
+  color:var(--t2);
+  transition:all .15s;
+  font-family: var(--font-mono);
+  letter-spacing: .5px;
+}
+.pill:hover { border-color:var(--b2);color:var(--t1); }
+.pill.sel { border-color:var(--re);color:var(--re);background:rgba(224,32,32,.08); }
+.pill.sel-cy { border-color:var(--cy);color:var(--cy);background:rgba(0,204,187,.06); }
+
+.cam-section { margin-top:12px;padding:14px;background:var(--card);border-radius:6px;border:1px solid var(--b1); }
+
+/* ══ MISSING CLASSES RESTORE ══ */
+.ita {
+  background: var(--card2);
+  border: 1px solid var(--b1);
+  border-radius: 4px;
+  color: var(--t1);
+  font-family: var(--font-body);
+  font-size: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  transition: border-color .15s;
+  outline: none;
+  resize: vertical;
+  display: block;
+}
+.ita:focus { border-color: rgba(224,32,32,0.4); background: #1a1a1a; }
+.ita::placeholder { color: var(--t3); }
+
+.plus { font-size: 28px; color: var(--t3); opacity: .4; }
+
+.ana-layout { display:flex; flex:1; overflow:hidden; }
+.ana-col-body { flex:1; overflow-y:auto; padding:16px 18px; font-size:12.5px; line-height:1.85; white-space:pre-wrap; }
+
+.big-or { background:var(--or)!important; }
+.or { color:var(--or); }
+
+.params-row { display:flex; gap:10px; margin-bottom:10px; }
+.params-row-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.plabel { font-size:10px; color:var(--t3); margin-bottom:4px; font-family:var(--font-mono); letter-spacing:.5px; }
+
+.usage-box { background:rgba(224,32,32,.05); border:1px solid rgba(224,32,32,.15); border-radius:6px; padding:12px 16px; margin-bottom:14px; }
+.usage-label { font-size:9px; color:var(--re); font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; font-family:var(--font-mono); }
+.usage-text { font-size:11px; color:var(--t2); line-height:1.7; }
+
+.img-count { font-size:10px; color:var(--t3); font-family:var(--font-mono); }
+
+/* ana waiting state */
+.ana-waiting { display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;color:var(--t3); }
+.ana-waiting-icon { font-size:52px; opacity:.12; }
+
+/* ══ ADDITIONAL RESTORED CLASSES ══ */
+.mo-acts { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+.fsel { background:var(--card2); border:1px solid var(--b1); border-radius:4px; color:var(--t1); font-family:var(--font-body); font-size:12px; padding:8px 12px; outline:none; width:100%; }
+.fsel:focus { border-color:rgba(224,32,32,0.4); }
+.sc { font-size:10px; color:var(--t3); margin-bottom:4px; }
+.result-card { background:var(--card); border:1px solid var(--b1); border-radius:6px; padding:16px; margin-bottom:12px; }
+.rc-label { font-family:var(--font-mono); font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--re); margin-bottom:8px; }
+.rc-content { font-size:12.5px; line-height:1.85; color:var(--t1); white-space:pre-wrap; }
+.shot-card { background:var(--card); border:1px solid var(--b1); border-radius:6px; padding:14px; margin-bottom:10px; }
+.shot-body { font-size:12px; line-height:1.7; color:var(--t1); }
+.col-lbl { font-size:10px; color:var(--t3); font-family:var(--font-mono); letter-spacing:.5px; margin-bottom:4px; }
+.asset-chip { display:inline-flex; align-items:center; gap:6px; background:rgba(224,32,32,.08); border:1px solid rgba(224,32,32,.2); border-radius:4px; padding:4px 10px; font-size:11px; color:var(--re); margin:3px; cursor:pointer; transition:all .15s; font-family:var(--font-mono); }
+.asset-chip:hover { background:rgba(224,32,32,.15); }
+.gallery-item { border-radius:6px; overflow:hidden; position:relative; }
+.period-select { background:var(--card2); border:1px solid var(--b1); border-radius:4px; color:var(--t1); font-family:var(--font-body); font-size:11px; padding:6px 10px; width:100%; outline:none; }
+.concept-ta { background:var(--card2); border:1px solid var(--b1); border-radius:4px; color:var(--t1); font-family:var(--font-body); font-size:12px; width:100%; padding:9px 12px; outline:none; resize:vertical; line-height:1.7; }
+.concept-ta:focus { border-color:rgba(224,32,32,0.4); }
+
+/* ══ PROJECT MODAL PILLS (图2 style) ══ */
+.tcols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.col-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 10px;
+}
+
+.tag-sel {
+  background: var(--card2);
+  border: 1px solid var(--b1);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--t1);
+  margin-bottom: 12px;
+  min-height: 44px;
+  line-height: 1.4;
+}
+
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-chip {
+  padding: 6px 14px;
+  border: 1px solid var(--b1);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--t2);
+  transition: all .15s;
+  background: transparent;
+  white-space: nowrap;
+}
+
+.tag-chip:hover {
+  border-color: rgba(224,32,32,0.4);
+  color: var(--t1);
+}
+
+.tag-chip.sel {
+  background: var(--re);
+  border-color: var(--re);
+  color: #fff;
+}
+
+/* Toggle block */
+.tog-block {
+  background: var(--card2);
+  border: 1px solid var(--b1);
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.tog-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+}
+
+.tog-lbl {
+  font-size: 12px;
+  color: var(--t2);
+  font-weight: 500;
+}
+
+.tok {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--t3);
+  transition: all .2s;
+  position: relative;
+  left: 2px;
+}
+
+.sub-fields {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--b1);
+}
+
+/* ══ CHIP (modal style/genre pills) ══ */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border: 1px solid var(--b2);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--t2);
+  transition: all .15s;
+  background: transparent;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.chip:hover {
+  border-color: rgba(224,32,32,0.5);
+  color: var(--t1);
+  background: rgba(224,32,32,0.05);
+}
+
+.chip.sel {
+  background: var(--re);
+  border-color: var(--re);
+  color: #fff;
+}
+
+/* ══ TOGGLE SWITCH (覆盖旧样式) ══ */
+.tog {
+  width: 52px !important;
+  height: 28px !important;
+  border-radius: 14px !important;
+  background: rgba(255,255,255,.1) !important;
+  border: none !important;
+  cursor: pointer;
+  position: relative;
+  transition: background .25s;
+  flex-shrink: 0;
+  display: block !important;
+  gap: unset !important;
+}
+.tok {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  position: absolute !important;
+  top: 3px !important;
+  left: 3px !important;
+  transition: left .25s !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,.4) !important;
+}
+.tog.on { background: #f97316 !important; }
+.tog.on .tok { left: 27px !important; }
+.tog.on-cy { background: #22c55e !important; }
+.tog.on-cy .tok { left: 27px !important; }
+
+/* ══ SHOT CARDS (单集导演引擎) ══ */
+.shot-card {
+  background: var(--card);
+  border: 1px solid var(--b1);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 2px;
+  transition: border-color .15s;
+}
+.shot-card:hover { border-color: var(--b2); }
+
+.shot-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(0,0,0,.25);
+  border-bottom: 1px solid var(--b1);
+  flex-wrap: wrap;
+}
+
+.shot-num {
+  font-family: var(--font-display);
+  font-size: 36px;
+  color: var(--re);
+  line-height: 1;
+  letter-spacing: 1px;
+  margin-right: 6px;
+}
+
+.shot-tag {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--card2);
+  border: 1px solid var(--b1);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  min-width: 0;
+}
+.shot-tag .tl { font-size: 9px; color: var(--t3); letter-spacing: .5px; text-transform: uppercase; }
+.shot-tag .tv { font-size: 12px; color: var(--t1); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+
+.shot-del-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid rgba(224,32,32,.2);
+  color: rgba(224,32,32,.5);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+.shot-del-btn:hover { border-color: var(--re); color: var(--re); background: rgba(224,32,32,.06); }
+
+.shot-param {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: var(--card2);
+  border: 1px solid var(--b1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  min-width: 64px;
+  flex: 1;
+}
+.sp-lbl { font-size: 9px; color: var(--t3); letter-spacing: 1px; text-transform: uppercase; }
+.sp-val { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* Color variants */
+.c-pu { color: var(--pu2); }
+.c-cy { color: var(--cy); }
+.c-or { color: var(--or); }
+.c-bl { color: var(--bl); }
+.c-ye { color: var(--ye); }
+.c-re { color: var(--re); }
+
+.shot-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+.shot-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--t2);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.shot-grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.shot-textarea {
+  width: 100%;
+  background: var(--card2);
+  border: 1px solid var(--b1);
+  border-radius: 8px;
+  color: var(--t1);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.75;
+  padding: 12px 14px;
+  resize: vertical;
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+}
+.shot-textarea:focus { border-color: rgba(224,32,32,.4); background: #1a1a1a; }
+
+/* Director page layout */
+.dir-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+.dir-left {
+  width: 340px;
+  min-width: 300px;
+  border-right: 1px solid var(--b1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--panel);
+}
+.dir-right {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+/* Episode list */
+.ep-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--t2);
+  transition: all .15s;
+  margin: 2px 8px;
+}
+.ep-item:hover { background: rgba(255,255,255,.04); color: var(--t1); }
+.ep-item.active { background: rgba(224,32,32,.08); color: var(--re); }
+
+/* concept-ta used in shot cards */
+.concept-ta {
+  width: 100%;
+  background: var(--card2);
+  border: 1px solid var(--b1);
+  border-radius: 8px;
+  color: var(--t1);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.75;
+  padding: 12px 14px;
+  resize: vertical;
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+}
+.concept-ta:focus { border-color: rgba(224,32,32,.4); }
+
+/* ══ LOGIN SCREEN ══ */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  background: #080808;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.login-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(224,32,32,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 80% 80%, rgba(224,32,32,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.login-box {
+  position: relative;
+  z-index: 1;
+  width: 420px;
+  padding: 52px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.login-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--re);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.login-logo {
+  font-family: var(--font-display);
+  font-size: 52px;
+  letter-spacing: 4px;
+  color: var(--t1);
+  line-height: 1;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.login-logo .red { color: var(--re); }
+
+.login-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--t3);
+  text-transform: uppercase;
+  margin-bottom: 52px;
+  text-align: center;
+}
+
+.login-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--re);
+  margin-bottom: 36px;
+  opacity: .6;
+}
+
+.login-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--t3);
+  text-transform: uppercase;
+  align-self: flex-start;
+  margin-bottom: 8px;
+}
+
+.login-input {
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 6px;
+  color: var(--t1);
+  font-size: 15px;
+  padding: 14px 18px;
+  outline: none;
+  transition: border-color .2s;
+  font-family: var(--font-mono);
+  letter-spacing: 4px;
+  text-align: center;
+  margin-bottom: 24px;
+  box-sizing: border-box;
+}
+
+.login-input:focus {
+  border-color: rgba(224,32,32,.5);
+  background: rgba(224,32,32,.03);
+}
+
+.login-input::placeholder {
+  letter-spacing: 2px;
+  color: var(--t3);
+  font-size: 12px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--re);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all .2s;
+  margin-bottom: 16px;
+}
+
+.login-btn:hover {
+  background: var(--re2);
+  box-shadow: 0 8px 32px rgba(224,32,32,.3);
+  transform: translateY(-1px);
+}
+
+.login-err {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--re);
+  letter-spacing: 1px;
+  min-height: 18px;
+  text-align: center;
+}
+
+.login-footer {
+  position: absolute;
+  bottom: 32px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--t3);
+  text-transform: uppercase;
+}
+
+/* GitHub sync indicator */
+#sync-indicator {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--t3);
+  z-index: 100;
+  transition: all .3s;
+}
+#sync-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--t3);
+  transition: background .3s;
+}
+#sync-indicator.syncing #sync-dot { background: var(--ye); animation: pulse 1s infinite; }
+#sync-indicator.synced #sync-dot { background: var(--gr); }
+#sync-indicator.error #sync-dot { background: var(--re); }
+</style>
+</head><body>
+
+<!-- ★ LOGIN SCREEN ★ -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-box">
+    <div class="login-eyebrow">// TEAM ACCESS</div>
+    <div class="login-logo">TT<span class="red">.</span>DIRECTOR</div>
+    <div class="login-sub">VISUAL · INTELLIGENCE · ENGINE</div>
+    <div class="login-divider"></div>
+    <div class="login-label">TEAM PASSWORD</div>
+    <input class="login-input" id="login-pwd" type="password" placeholder="输入团队密码" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">ENTER →</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+  <div class="login-footer">TT DIRECTOR AI · V2.1 · TEAM EDITION</div>
+</div>
+
+<!-- GitHub sync indicator -->
+<div id="sync-indicator">
+  <div id="sync-dot"></div>
+  <span id="sync-txt">READY</span>
+</div>
+
+<div class="sb">
+  <div class="sb-logo"><div class="logo-txt">🎬 TT Director AI</div><div class="logo-sub">短视频导演创作平台</div></div>
+  <div class="sb-ts" id="sb-ts"></div>
+  <div class="sb-scroll">
+    <div class="sb-sec">创作中心</div>
+    <div class="ni active" onclick="showPage('projects',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 6.5h14" stroke="currentColor" stroke-width="1.2"/><path d="M4 4V2.5a.5.5 0 01.5-.5h3l1.5 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>剧本项目中心</div>
+    <div class="ni" onclick="showPage('world',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><ellipse cx="8" cy="8" rx="2.8" ry="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 8h13M2 5h12M2 11h12" stroke="currentColor" stroke-width="1"/></svg></span>世界观构建</div>
+    <div class="ni" onclick="showPage('director',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="5" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 8h14" stroke="currentColor" stroke-width="1.2"/><path d="M1 5l2.5-3h9L15 5" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 5l1-3M9 5l1-3" stroke="currentColor" stroke-width="1.2"/></svg></span>单集导演引擎</div>
+    <div class="ni" onclick="showPage('analyzer',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="5" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="9.5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 5l1-2h3l1 2" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="12.5" cy="7" r=".8" fill="currentColor"/></svg></span>剧本识图分析仪</div>
+    <div class="ni" onclick="showPage('grid9',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="6" y="1.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="10.5" y="1.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="6" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="6" y="6" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="10.5" y="6" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="10.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="6" y="10.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="10.5" y="10.5" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/></svg></span>分镜九宫格</div>
+    <div class="ni" onclick="showPage('multi9',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="9" height="7" rx="1.2" stroke="currentColor" stroke-width="1.2"/><rect x="6" y="8" width="9" height="7" rx="1.2" stroke="currentColor" stroke-width="1.2"/><circle cx="5.5" cy="6.5" r="1.2" stroke="currentColor" stroke-width="1"/><path d="M2.5 9L5 6.5 7 8" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg></span>多角度九宫格助手</div>
+    <div class="ni" onclick="showPage('nanobanana',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 8h2M13 8h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M3 8V5.5M5 8V3M7 8V5M9 8V2.5M11 8V5M13 8V5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M3 8v2.5M5 8v5M7 8v3M9 8v5.5M11 8v3M13 8v2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>Nanobanana 提示词</div>
+    <div class="ni" onclick="showPage('midjourney',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="5.5" cy="6.5" r="1.2" stroke="currentColor" stroke-width="1"/><path d="M1.5 11l3.5-3.5 2.5 2.5 2.5-3 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Midjourney 提示词<span class="nbadge bnew">NEW</span></div>
+    <div class="ni" onclick="showPage('sdance',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="2" r="1" fill="currentColor"/><circle cx="8" cy="14" r="1" fill="currentColor"/><circle cx="2" cy="8" r="1" fill="currentColor"/><circle cx="14" cy="8" r="1" fill="currentColor"/><circle cx="3.5" cy="3.5" r="1" fill="currentColor"/><circle cx="12.5" cy="12.5" r="1" fill="currentColor"/><circle cx="3.5" cy="12.5" r="1" fill="currentColor"/><circle cx="12.5" cy="3.5" r="1" fill="currentColor"/></svg></span>Sdance 2.0 提示词</div>
+    <div class="ni" onclick="showPage('multipt',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9.5 1.5L3.5 9h5L5.5 14.5l7-9h-5l2-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></span>多功能提示词大师</div>
+    <div class="sb-sec">系统管理</div>
+    <div class="ni" onclick="showPage('settings',this)"><span class="ni-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.2" stroke="currentColor" stroke-width="1.2"/><path d="M8 1.5v1.2M8 13.3v1.2M1.5 8h1.2M13.3 8h1.2M3.4 3.4l.85.85M11.75 11.75l.85.85M3.4 12.6l.85-.85M11.75 4.25l.85-.85" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></span>系统设置</div>
+  </div>
+  <div class="sb-bot">
+    <div class="vl"><span>TT DIRECTOR AI</span><span>v2.1</span></div>
+    <button class="bsm" onclick="manualSave()" style="background:rgba(224,32,32,.1);border-color:rgba(224,32,32,.3);color:var(--re)">💾 保存项目</button>
+    <button class="bsm" onclick="saveAndExit()">← 退出项目</button>
+    <button class="bsm bdan" onclick="localStorage.removeItem('tt_auth');location.reload()">安全登出</button>
+  </div>
+</div>
+<div class="main">
+
+<!-- PROJECTS -->
+<div class="page active-page fi" id="page-projects">
+  <!-- Hero section -->
+  <div style="flex:1;overflow-y:auto;background:var(--bg)">
+    <div class="pc-hero">
+      <div class="pc-eyebrow">// DIRECTOR AI · PROJECT CENTER</div>
+      <div class="pc-headline">YOUR<br><span>STORY</span><br>BEGINS.</div>
+      <div class="pc-subline" style="margin-top:16px">每一个项目，都是一次电影级创作的起点</div>
+    </div>
+
+    <div class="pc-create">
+      <div style="display:flex;gap:12px;align-items:center">
+        <button class="pc-create-btn" onclick="openModal()">
+          <span style="font-size:18px">＋</span> NEW PROJECT
+        </button>
+        <button class="bpo" onclick="" style="padding:13px 20px;font-family:var(--font-mono);font-size:10px;letter-spacing:1px">↺ 刷新</button>
+        <button class="bpo" onclick="" style="padding:13px 20px;font-family:var(--font-mono);font-size:10px;letter-spacing:1px">⬆ 导入</button>
+      </div>
+    </div>
+
+    <div class="pc-divider"></div>
+
+    <div class="pc-grid" id="proj-grid">
+    </div>
+  </div>
+</div>
+
+<!-- WORLD BUILDER -->
+<div class="page fi" id="page-world" style="flex-direction:column;min-height:0;overflow:hidden">
+  <div class="th" style="padding:12px 20px;gap:8px">
+    <div class="th-icon" style="background:rgba(34,211,200,0.15);font-size:14px">🌐</div>
+    <div><div class="th-title" style="font-size:14px">世界观构建</div><div class="th-sub" style="font-size:9px">WORLD BUILDING · ASSET LIBRARY</div></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <div id="proj-info-banner" style="display:none;align-items:center;gap:6px;padding:3px 8px;background:rgba(34,211,200,0.06);border:1px solid rgba(34,211,200,0.2);border-radius:5px"><span id="proj-info-tag" class="ct" style="margin:0;font-size:9px"></span><span id="proj-info-title" style="font-size:11px;font-weight:500;color:var(--t1)"></span><span id="proj-info-meta" style="font-size:10px;color:var(--t3)"></span></div>
+      <button class="bpo" style="font-size:10px;padding:3px 8px" onclick="showPage('projects',null)">← 返回</button>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;overflow:hidden;min-height:0;align-items:stretch">
+    <div id="world-subnav" style="width:220px;min-width:180px;background:var(--panel);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden">
+      <div style="padding:8px 10px 4px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;flex-shrink:0">项目浏览器</div>
+      <div style="flex:1;overflow-y:auto;overflow-x:hidden">
+        <div class="wni active" id="wni-script" onclick="selectWorldAsset('script',null,this)"><span style="font-size:12px">📄</span><span>剧本源文件</span></div>
+        <div class="wni-section"><div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer"><span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--t2)"><span>👥</span>角色库</span><span id="chars-count" style="font-size:10px;color:var(--t3)">0</span></div><div id="chars-list" style="margin-top:4px"></div></div>
+        <div class="wni-section"><div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer"><span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--t2)"><span>🏔</span>场景库</span><span id="scenes-count" style="font-size:10px;color:var(--t3)">0</span></div><div id="scenes-list" style="margin-top:4px"></div></div>
+        <div class="wni-section"><div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer"><span style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--t2)"><span>📦</span>物品库</span><span id="items-count" style="font-size:10px;color:var(--t3)">0</span></div><div id="items-list" style="margin-top:4px"></div></div>
+      </div>
+      <div style="padding:8px;flex-shrink:0;border-top:1px solid var(--b1);background:var(--panel)"><button class="big-btn big-pu" style="margin:0;padding:9px;font-size:12px" onclick="showPage('director',document.querySelector('.ni[onclick*=director]'))">🚀 进入导演引擎</button></div>
+    </div>
+    <div id="world-detail" style="width:380px;min-width:300px;border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden">
+      <div id="wd-script" class="wd-panel" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+        <div style="padding:16px 18px;border-bottom:1px solid var(--b1);flex-shrink:0"><div style="font-size:18px;font-weight:700;margin-bottom:2px">剧本源文件分析</div></div>
+        <div style="flex:1;overflow-y:auto;padding:14px 18px"><textarea class="ita" id="world-script-ta" rows="20" placeholder="在此粘贴剧本内容..." style="width:100%;resize:none;min-height:300px;font-size:12px;line-height:1.8"></textarea></div>
+        <div style="padding:10px 14px;border-top:1px solid var(--b1);display:flex;gap:8px;flex-shrink:0"><button class="big-btn big-pu" id="world-analyze-btn" onclick="runWorldAnalysis()" style="flex:1;margin:0;padding:12px;font-size:13px">↺ 增量同步剧本资产</button><button class="bpo" style="font-size:11px" onclick="resetWorld()">重置世界</button></div>
+      </div>
+      <div id="wd-char" class="wd-panel" style="display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;flex-shrink:0"><div id="char-avatar" style="width:44px;height:44px;background:rgba(124,111,247,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">👤</div><div><div id="char-name" style="font-size:16px;font-weight:700"></div><div id="char-code" style="font-size:10px;color:var(--t3)">CHAR ASSET CORE</div></div><button class="bpo" style="margin-left:auto;font-size:10px;border-color:rgba(239,68,68,.3);color:var(--re)" onclick="deleteAsset('char')">🗑 删除资产</button></div>
+        <div style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px"><div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-size:10px;color:var(--ye);font-weight:600">✦ 角色视觉提示词</div><button class="bpo" style="font-size:10px;padding:2px 8px;color:var(--bl)" onclick="aiOptimizePrompt('char')">AI 辅助优化</button></div><textarea class="ita" id="char-prompt" rows="6" style="width:100%;font-size:11px;line-height:1.7;resize:none" placeholder="角色视觉描述..."></textarea></div><div><div style="font-size:10px;color:var(--or);font-weight:600;margin-bottom:5px">📝 修改意见与备注</div><textarea class="ita" id="char-notes" rows="3" style="width:100%;font-size:11px;resize:none" placeholder="添加修改意见..."></textarea></div></div>
+        <div style="padding:8px 14px;border-top:1px solid var(--b1);flex-shrink:0"><button class="big-btn big-pu" style="margin:0;width:100%;padding:9px;font-size:12px" onclick="saveCharAsset()">保存角色资产</button></div>
+      </div>
+      <div id="wd-scene" class="wd-panel" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;flex-shrink:0"><div id="scene-avatar" style="width:44px;height:44px;background:rgba(34,211,200,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">🏔</div><div><div id="scene-name" style="font-size:16px;font-weight:700"></div><div id="scene-code" style="font-size:10px;color:var(--t3)">LOC ASSET CORE</div></div><button class="bpo" style="margin-left:auto;font-size:10px;border-color:rgba(239,68,68,.3);color:var(--re)" onclick="deleteAsset('scene')">🗑 删除资产</button></div>
+        <div style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px"><div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-size:10px;color:var(--ye);font-weight:600">✦ 场景视觉提示词</div><button class="bpo" style="font-size:10px;padding:2px 8px;color:var(--bl)" onclick="aiOptimizePrompt('scene')">AI 辅助优化</button></div><textarea class="ita" id="scene-prompt" rows="5" style="width:100%;font-size:11px;line-height:1.7;resize:none" placeholder="场景视觉描述..."></textarea></div><div class="sg" style="margin-bottom:0"><div><div style="font-size:10px;color:var(--t3);margin-bottom:4px">氛围</div><input class="inp" id="scene-mood" placeholder="Cinematic"></div><div><div style="font-size:10px;color:var(--t3);margin-bottom:4px">光影</div><input class="inp" id="scene-light" placeholder="High contrast natural light"></div></div><div><div style="font-size:10px;color:var(--or);font-weight:600;margin-bottom:5px">📝 修改意见</div><textarea class="ita" id="scene-notes" rows="2" style="width:100%;font-size:11px;resize:none" placeholder="添加修改意见..."></textarea></div></div>
+        <div style="padding:8px 14px;border-top:1px solid var(--b1);flex-shrink:0"><button class="big-btn" style="margin:0;width:100%;padding:9px;font-size:12px;background:linear-gradient(135deg,var(--cy),#1ab5ab);color:#000" onclick="saveSceneAsset()">保存场景资产</button></div>
+      </div>
+      <div id="wd-item" class="wd-panel" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:10px;flex-shrink:0"><div id="item-avatar" style="width:44px;height:44px;background:rgba(234,179,8,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">📦</div><div><div id="item-name" style="font-size:16px;font-weight:700"></div><div id="item-code" style="font-size:10px;color:var(--t3)">PROP ASSET CORE</div></div><button class="bpo" style="margin-left:auto;font-size:10px;border-color:rgba(239,68,68,.3);color:var(--re)" onclick="deleteAsset('item')">🗑 删除资产</button></div>
+        <div style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px"><div><div style="font-size:10px;color:var(--ye);font-weight:600;margin-bottom:6px">✦ 物品视觉提示词</div><textarea class="ita" id="item-prompt" rows="5" style="width:100%;font-size:11px;line-height:1.7;resize:none" placeholder="物品视觉描述..."></textarea></div><div><div style="font-size:10px;color:var(--t3);margin-bottom:4px">分类</div><input class="inp" id="item-category" value="关键道具" style="margin-bottom:6px"></div><div><div style="font-size:10px;color:var(--or);font-weight:600;margin-bottom:5px">📝 修改意见</div><textarea class="ita" id="item-notes" rows="2" style="width:100%;font-size:11px;resize:none" placeholder="添加修改意见..."></textarea></div></div>
+        <div style="padding:8px 14px;border-top:1px solid var(--b1);flex-shrink:0"><button class="big-btn big-or" style="margin:0;width:100%;padding:9px;font-size:12px" onclick="saveItemAsset()">保存物品资产</button></div>
+      </div>
+    </div>
+    <div id="world-archive" style="flex:1;position:relative;background:var(--bg);min-width:0;overflow:hidden">
+      <div id="wa-script" class="wa-panel" style="display:none;flex-direction:column;flex:1;overflow:hidden;background:var(--bg)"><div style="padding:14px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:8px;flex-shrink:0"><div style="font-size:13px;font-weight:600;color:var(--t1)">AI 分析结果</div><div id="wa-script-status" style="font-size:10px;color:var(--t3);margin-left:4px">等待分析...</div></div><div id="wa-script-content" style="flex:1;min-height:0;overflow-y:auto;padding:16px 20px"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--t3)"><div style="font-size:32px;opacity:.3">🎬</div><div style="font-size:13px">粘贴剧本后点击「增量同步剧本资产」</div><div style="font-size:11px;color:var(--t3)">AI 将自动提取角色、场景、物品并填充到左侧库</div></div></div></div>
+      <div id="wa-char" class="wa-panel" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;background:var(--bg);overflow:hidden"><div style="padding:12px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;height:58px;flex-shrink:0;background:var(--bg);position:relative;z-index:1"><div><div style="font-size:16px;font-weight:700">人物形象档案库</div><div style="font-size:10px;color:var(--t3);margin-top:1px">点击时期卡片展开 · 右侧滚动查看所有时期参考图与三视图</div></div><button class="bpr" id="wa-add-char" style="font-size:11px;padding:5px 12px">＋ 新增形象时期</button></div><div style="position:absolute;top:58px;left:0;right:0;bottom:0;display:flex;overflow:hidden"><div id="wa-char-content" style="flex:1;min-width:0;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px;scrollbar-width:thin;scrollbar-color:rgba(124,111,247,.4) rgba(255,255,255,.04);box-sizing:border-box"></div><div id="wa-char-imgpanel" style="width:296px;min-width:296px;border-left:1px solid rgba(255,255,255,.07);background:#0f1117;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(124,111,247,.4) rgba(0,0,0,.2);display:flex;flex-direction:column"><div style="padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);font-size:10px;color:var(--t2);font-weight:700;letter-spacing:.8px;flex-shrink:0;text-transform:uppercase">📷 参考图 & 三视图</div><div id="wa-char-imglist" style="padding:12px;display:flex;flex-direction:column;gap:0"></div></div></div></div>
+      <div id="wa-scene" class="wa-panel" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;background:var(--bg);overflow:hidden"><div style="padding:12px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0"><div><div style="font-size:16px;font-weight:700">场景状态档案库</div><div style="font-size:10px;color:var(--t3);margin-top:1px">手动管理场景在不同时段或剧情下的氛围图</div></div><button class="bpr" style="font-size:11px;padding:5px 12px;background:var(--cy);color:#000" id="wa-add-scene">＋ 新增场景状态</button></div><div style="position:absolute;top:58px;left:0;right:0;bottom:0;display:flex;overflow:hidden"><div id="wa-scene-content" style="flex:1;min-width:0;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px;scrollbar-width:thin;scrollbar-color:rgba(124,111,247,.4) rgba(255,255,255,.04);box-sizing:border-box"></div><div id="wa-scene-imgpanel" style="width:296px;min-width:296px;border-left:1px solid rgba(255,255,255,.07);background:#0f1117;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(124,111,247,.4) rgba(0,0,0,.2);display:flex;flex-direction:column"><div style="padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);font-size:10px;color:var(--t2);font-weight:700;letter-spacing:.8px;flex-shrink:0;text-transform:uppercase">📷 参考图 & 三视图</div><div id="wa-scene-imglist" style="padding:12px;display:flex;flex-direction:column;gap:0"></div></div></div></div>
+      <div id="wa-item" class="wa-panel" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;flex-direction:column;background:var(--bg);overflow:hidden"><div style="padding:12px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0"><div><div style="font-size:16px;font-weight:700">道具形象档案库</div><div style="font-size:10px;color:var(--t3);margin-top:1px">手动管理道具视觉参考</div></div><button class="bpr" style="font-size:11px;padding:5px 12px;background:var(--or)" id="wa-add-item">＋ 新增道具图</button></div><div style="position:absolute;top:58px;left:0;right:0;bottom:0;display:flex;overflow:hidden"><div id="wa-item-content" style="flex:1;min-width:0;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px;scrollbar-width:thin;scrollbar-color:rgba(124,111,247,.4) rgba(255,255,255,.04);box-sizing:border-box"></div><div id="wa-item-imgpanel" style="width:296px;min-width:296px;border-left:1px solid rgba(255,255,255,.07);background:#0f1117;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(124,111,247,.4) rgba(0,0,0,.2);display:flex;flex-direction:column"><div style="padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,.06);font-size:10px;color:var(--t2);font-weight:700;letter-spacing:.8px;flex-shrink:0;text-transform:uppercase">📷 参考图 & 三视图</div><div id="wa-item-imglist" style="padding:12px;display:flex;flex-direction:column;gap:0"></div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTOR -->
+<div class="page fi" id="page-director">
+  <div class="th" style="padding:12px 20px"><div class="th-icon" style="background:rgba(249,115,22,0.15);font-size:14px">🎬</div><div><div class="th-title">智能分镜分析引擎</div><div class="th-sub">EPISODE DIRECTOR ENGINE V3.0</div></div><div style="margin-left:auto;display:flex;gap:8px"><button class="hist-btn" onclick="openHistory('director')" style="font-size:11px">📋 历史记录 (0)</button><div id="dir-export-btn" style="display:none;gap:8px"><button class="bpo" onclick="showStoryboardPreview()" style="font-size:11px;padding:6px 12px">📋 预览分镜脚本表</button><button class="bpr" onclick="exportDirectorCSV()" style="font-size:11px;padding:6px 12px">📤 导出 CSV</button></div></div></div>
+  <div class="split" style="overflow:hidden">
+    <div class="split-l" style="width:340px;min-width:260px;overflow-y:auto">
+      <div style="padding:10px 12px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between"><span style="font-size:11px;color:var(--t2)">剧集列表</span><button class="bpo" style="font-size:10px;padding:3px 8px" onclick="addEpisode()">＋ 新增集数</button></div>
+      <div id="episode-list" style="padding:8px"></div>
+      <div style="padding:10px 12px;border-bottom:1px solid var(--b1)"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;color:var(--t2)">粘贴单集剧本</span><button class="bpo" style="font-size:10px;padding:2px 8px" onclick="expandDirInput()">⬜ 扩大输入框</button></div><textarea class="ita" id="dir-script" rows="12" placeholder="在此粘贴您的剧本文字..." style="width:100%;resize:vertical;font-size:11px;line-height:1.7"></textarea></div>
+      <div style="padding:10px 12px;border-bottom:1px solid var(--b1)"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:10px;color:var(--t3)">目标镜头数</span><span style="font-size:9px;color:var(--t3)">短剧8-16 / 单集16-24 / 长片24-36</span></div><div style="background:var(--card2);border:1px solid var(--b1);border-radius:8px;padding:6px 10px;display:flex;align-items:center;gap:8px"><button onclick="adjustShots(-1)" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--b2);color:var(--t1);font-size:18px;cursor:pointer;line-height:1;flex-shrink:0">−</button><input type="number" id="dir-shotcount" value="16" min="1" max="60" style="flex:1;font-size:30px;font-weight:700;font-family:'Space Grotesk',sans-serif;background:transparent;border:none;color:var(--t1);text-align:center;outline:none;width:0" oninput="adjustShots(0)"><button onclick="adjustShots(1)" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--b2);color:var(--t1);font-size:18px;cursor:pointer;line-height:1;flex-shrink:0">＋</button></div><div id="shot-hint" style="font-size:10px;color:var(--pu2);text-align:center;margin-top:4px">≈ 48秒 · 短剧单集节奏</div><div style="display:flex;gap:4px;margin-top:6px"><button onclick="setShots(8)" class="bpo" style="flex:1;font-size:10px;padding:4px 2px;text-align:center;display:flex;flex-direction:column;align-items:center">8<span style="color:var(--t3);font-size:9px">预告片</span></button><button onclick="setShots(16)" class="bpo" style="flex:1;font-size:10px;padding:4px 2px;text-align:center;display:flex;flex-direction:column;align-items:center">16<span style="color:var(--t3);font-size:9px">短剧单集</span></button><button onclick="setShots(24)" class="bpo" style="flex:1;font-size:10px;padding:4px 2px;text-align:center;display:flex;flex-direction:column;align-items:center">24<span style="color:var(--t3);font-size:9px">长片片段</span></button><button onclick="setShots(36)" class="bpo" style="flex:1;font-size:10px;padding:4px 2px;text-align:center;display:flex;flex-direction:column;align-items:center">36<span style="color:var(--t3);font-size:9px">完整集数</span></button></div></div>
+      <div style="padding:10px 12px"><button class="big-btn big-pu" id="dir-btn" onclick="runDirector()" style="margin:0;width:100%;padding:12px;font-size:13px">🚀 启动智能分镜分析</button><div id="dir-progress" style="margin-top:8px;font-size:11px;color:var(--t3);text-align:center;display:none">正在导演级分析...</div></div>
+    </div>
+    <div id="dir-right" style="flex:1;overflow-y:auto;background:rgba(0,0,0,0.2);padding:16px;display:flex;flex-direction:column;gap:0"><div id="dir-empty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:400px"><div style="width:48px;height:48px;border-radius:50%;background:var(--card2);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;color:var(--t2)" onclick="runDirector()">＋</div><div style="font-size:12px;color:var(--t3)">粘贴剧本并点击分析，分镜卡片将在此展示</div></div><div id="dir-shots" style="display:flex;flex-direction:column;gap:20px"></div></div>
+  </div>
+</div>
+
+<!-- ANALYZER -->
+<div class="page fi" id="page-analyzer" style="flex-direction:column">
+  <div class="th" style="padding:12px 20px"><div class="th-icon" style="background:rgba(77,166,255,0.15);font-size:14px">📷</div><div><div class="th-title">导演级剧本识图分析仪</div><div class="th-sub">STORYBOARD VISUAL INTELLIGENCE ENGINE</div></div><div style="margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><div style="font-size:10px;color:var(--t3);display:flex;flex-direction:column;gap:1px"><div>分析模式: <span style="color:var(--pu2)" id="ana-mode-lbl">未选择项目</span></div><div>画风: <span style="color:var(--ye)" id="ana-style-lbl">—</span></div></div><button class="hist-btn" onclick="openHistory('analyzer')">📋 历史记录 (0)</button><button class="bpr" onclick="anaCopy('main')" style="background:var(--or)">复制【主镜定调】</button><button class="bpr" onclick="anaCopy('video')">复制【视频生成】</button><button class="bpr" onclick="anaCopy('scene')" style="background:var(--gr);color:#000">复制【分镜生图】</button></div></div>
+  <div class="ana-layout">
+    <div class="ana-col" style="max-width:360px;min-width:280px"><div class="ana-col-hdr" style="flex-direction:column;align-items:flex-start;gap:4px"><div style="font-size:12px;font-weight:500">点击或粘贴分镜表截图</div><div style="font-size:10px;color:var(--t3)">JPG · PNG · CLIPBOARD · 支持长图全段识别</div></div><div style="flex:1;padding:10px;display:flex;flex-direction:column;gap:8px;overflow-y:auto">
+    <!-- 从导演引擎调取分镜 -->
+    <div style="border:1px solid rgba(124,111,247,.3);border-radius:10px;padding:10px;background:rgba(124,111,247,.04)">
+      <div style="font-size:10px;font-weight:600;color:var(--pu2);margin-bottom:8px;display:flex;align-items:center;gap:4px">✦ 从单集导演引擎调取分镜</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center">
+        <select id="ana-ep-select" class="isel" style="flex:1;font-size:11px" onchange="loadAnaEpShots()">
+          <option value="">选择集数...</option>
+        </select>
+        <button class="bpo" style="font-size:10px;padding:4px 10px;white-space:nowrap" onclick="refreshAnaEpList()">刷新</button>
+      </div>
+      <div id="ana-shots-list" style="display:none;background:var(--card2);border:1px solid var(--b1);border-radius:8px;padding:8px;max-height:160px;overflow-y:auto">
+        <div style="font-size:10px;color:var(--t3);margin-bottom:6px">选择要分析的镜头：</div>
+        <div id="ana-shots-checks"></div>
+        <button onclick="importSelectedShots()" class="big-btn big-pu" style="margin:8px 0 0;width:100%;padding:6px;font-size:11px">✦ 导入选中镜头到分析</button>
+      </div>
+    </div>
+    <!-- 文字输入区（推荐）-->
+    <div style="border:1px solid rgba(77,166,255,.2);border-radius:10px;padding:10px;background:rgba(77,166,255,.03)">
+      <div style="font-size:10px;font-weight:600;color:var(--bl);margin-bottom:6px;display:flex;align-items:center;gap:4px">📝 或直接粘贴脚本文字</div>
+      <textarea id="ana-script-input" class="ita" rows="5" placeholder="从Word/Excel中复制分镜表内容粘贴到这里..." style="width:100%;font-size:11px;line-height:1.6;resize:vertical"></textarea>
+    </div>
+    <div style="text-align:center;font-size:10px;color:var(--t3)">— 或上传截图 —</div><div class="img-zone" id="ana-drop-zone" style="min-height:280px;flex:1;cursor:pointer;position:relative;overflow:hidden" onclick="document.getElementById('ana-file').click()" ondrop="handleImgDrop(event,'ana-prev')" ondragover="event.preventDefault()" onpaste="handleZonePaste(event,'ana-prev')"><img id="ana-prev" class="preview" style="display:none;width:100%;height:100%;object-fit:contain;position:absolute;top:0;left:0;border-radius:8px"><div id="ana-upload-hint" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px"><div style="font-size:32px">🖼</div><div class="iz-lbl" style="font-size:13px;font-weight:500">点击或粘贴分镜截图</div><div class="iz-sub" style="font-size:11px;color:var(--t3)">支持长图全段识别 · Ctrl+V 粘贴</div></div><input type="file" id="ana-file" accept="image/*" style="display:none" onchange="loadImg(this,'ana-prev')"></div></div><div style="padding:8px 10px;border-top:1px solid var(--b1);flex-shrink:0"><button class="big-btn big-pu" style="margin:0;width:100%;padding:10px;font-size:13px" onclick="runAnalyzer()" id="ana-btn">🚀 启动分镜智能分析</button></div></div>
+    <div class="ana-col"><div class="ana-col-hdr" style="background:rgba(249,115,22,0.06);justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="color:var(--or)">●</span><span>主镜版（宏观统筹/画风锁定）</span></div><button class="copy-btn" onclick="anaCopy('main')">复制</button></div><div class="ana-col-body" id="ana-main-col"><div class="ana-waiting"><div class="ana-waiting-icon">🏛</div><div>等待主镜版生成</div></div></div></div>
+    <div class="ana-col"><div class="ana-col-hdr" style="background:rgba(77,166,255,0.06);justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="color:var(--bl)">●</span><span>视频版（台词/语气/音效/画面）</span></div><button class="copy-btn" onclick="anaCopy('video')">复制</button></div><div class="ana-col-body" id="ana-video-col"><div class="ana-waiting"><div class="ana-waiting-icon">🎞</div><div>等待视频版生成</div></div></div></div>
+    <div class="ana-col"><div class="ana-col-hdr" style="background:rgba(34,197,94,0.06);justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="color:var(--gr)">●</span><span>生图版（纯视觉画面描述）</span></div><button class="copy-btn" onclick="anaCopy('scene')">复制</button></div><div class="ana-col-body" id="ana-scene-col"><div class="ana-waiting"><div class="ana-waiting-icon">🖼</div><div>等待生图版生成</div></div></div></div>
+  </div>
+  <div style="padding:10px 20px;border-top:1px solid var(--b1);background:rgba(124,111,247,.04);flex-shrink:0;display:flex;align-items:flex-start;gap:8px">
+    <span style="font-size:11px;font-weight:600;color:var(--pu2);white-space:nowrap;margin-top:1px">🎬 导演工作建议：</span>
+    <span style="font-size:11px;color:var(--t2);line-height:1.7"><span style="color:var(--or);font-weight:500">【主镜版】</span>用于确定场景基调、人物站位和画风锚点，建议作为第一张参考图生成；<span style="color:var(--bl);font-weight:500">【视频版】</span>包含台词、运镜和音效，适用于 Veo/Runway 等视频模型；<span style="color:var(--gr);font-weight:500">【生图版】</span>侧重单镜头微观视觉刻画，适用于 Midjourney/SD 生成分镜底图。</span>
+  </div>
+</div>
+
+<!-- GRID9 -->
+<div class="page fi" id="page-grid9">
+  <div class="th" style="padding:12px 20px;gap:8px">
+    <div class="th-icon" style="background:rgba(239,68,68,0.15);font-size:14px">🧩</div>
+    <div><div class="th-title" style="font-size:14px">分镜九宫格</div><div class="th-sub" style="font-size:9px">STORYBOARD 3X3 GRID ENGINE</div></div>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="bpo" style="font-size:11px" onclick="copyGridPrompts()">复制分镜提取提示词</button>
+      <button class="bpr" style="background:var(--re)" onclick="exportGrid()">🚀 导出九宫格分镜</button>
+    </div>
+  </div>
+  <div style="flex:1;display:flex;overflow:hidden">
+    <!-- LEFT: inputs -->
+    <div style="width:320px;min-width:260px;border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow-y:auto">
+      <div class="iblock">
+        <div class="ilabel hl">1. 主镜参考图（视觉锚点）</div>
+        <div class="img-zone" id="g9-drop-zone" style="height:200px;position:relative;overflow:hidden" onclick="document.getElementById('g9-main-file').click()" ondrop="handleImgDrop(event,'g9-main-prev')" ondragover="event.preventDefault()">
+          <img id="g9-main-prev" class="preview" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:8px">
+          <div id="g9-upload-hint" style="display:flex;flex-direction:column;align-items:center;gap:6px"><div class="plus">🖼</div><div class="iz-lbl">点击或拖入参考图</div></div>
+          <input type="file" id="g9-main-file" accept="image/*" style="display:none" onchange="loadImg(this,'g9-main-prev');document.getElementById('g9-upload-hint').style.display='none'">
+        </div>
+      </div>
+      <div class="iblock">
+        <div class="ilabel hl" style="margin-bottom:6px">2. 剧情文案</div>
+        <textarea class="ita" rows="7" placeholder="输入剧情段落，包含场景、对白、动作描述..." id="g9-script" style="width:100%;font-size:12px;line-height:1.7;resize:vertical"></textarea>
+      </div>
+      <div class="iblock">
+        <div class="ilabel" style="margin-bottom:8px">⚙ 通用参数</div>
+        <div class="params-row" style="gap:8px">
+          <div><div class="plabel">画幅</div>
+            <select class="isel" id="g9-ratio" style="width:100%"><option value="16:9">16:9</option><option value="9:16">9:16</option><option value="21:9">21:9</option><option value="1:1">1:1</option></select>
+          </div>
+          <div><div class="plabel">质量</div>
+            <select class="isel" id="g9-quality" style="width:100%"><option value="2K">2K</option><option value="4K">4K</option><option value="1080P">1080P</option></select>
+          </div>
+        </div>
+      </div>
+      <div style="padding:10px 12px">
+        <button class="big-btn big-re" id="g9-btn" onclick="runGrid9()" style="margin:0;width:100%;padding:12px;font-size:13px">✦ 生成九宫格分镜</button>
+      </div>
+    </div>
+    <!-- RIGHT: output -->
+    <div style="flex:1;overflow-y:auto;background:rgba(0,0,0,.1);padding:20px 24px" id="g9-output">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:10px;color:var(--t3)">
+        <div style="font-size:32px;opacity:.3">🧩</div>
+        <div style="font-size:13px">输入剧情文案并点击生成</div>
+        <div style="font-size:11px">AI 将输出9个镜头的专业分镜提示词</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MULTI9 -->
+<div class="page fi" id="page-multi9">
+  <div class="th">
+    <div class="th-icon" style="background:rgba(34,211,200,0.15);font-size:14px">🎥</div>
+    <div><div class="th-title">多角度九宫格助手</div><div class="th-sub">MULTI-ANGLE 3X3 GRID ENGINE · 9 SHOTS · 1 SCENE</div></div>
+    <div style="margin-left:auto"><button class="hist-btn" onclick="openHistory('multi9')">📋 历史记录</button></div>
+  </div>
+  <div style="flex:1;display:flex;overflow:hidden">
+    <!-- LEFT -->
+    <div style="width:300px;min-width:280px;border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow-y:auto">
+
+      <!-- 模式说明 红框 -->
+      <div style="margin:14px 12px 0;background:rgba(124,111,247,.08);border:1px solid rgba(124,111,247,.2);border-radius:10px;padding:11px 13px">
+        <div style="font-size:10px;color:var(--pu2);font-weight:700;margin-bottom:5px;letter-spacing:.5px">💡 模式说明 (USAGE)</div>
+        <div style="font-size:11px;color:var(--t2);line-height:1.7">生成同一环境中的 <strong style="color:var(--t1)">9 个不同摄像机镜头</strong>（3×3网格），严格保持一致性。包含特写、中景、远景、低角度、平视、高角度、荷兰角、剪影和过肩镜头。</div>
+      </div>
+
+      <div class="iblock" style="margin-top:12px">
+        <div class="ilabel hl">1. 视觉参考 (VISUAL REFERENCE)</div>
+        <div class="img-zone" id="m9-drop-zone" style="height:190px;position:relative;overflow:hidden"
+          onclick="document.getElementById('m9-file').click()"
+          ondrop="m9HandleDrop(event)" ondragover="event.preventDefault()">
+          <img id="m9-prev" class="preview" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;border-radius:8px">
+          <div id="m9-drop-hint" style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="font-size:28px">🖼</div>
+            <div class="iz-lbl">参考图片</div>
+            <div style="font-size:10px;color:var(--t3)">Click or Paste</div>
+          </div>
+          <button id="m9-clear-btn" onclick="event.stopPropagation();m9ClearImg()" style="display:none;position:absolute;top:6px;right:6px;background:rgba(239,68,68,.85);border:none;color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px;line-height:22px;text-align:center;z-index:2">✕</button>
+          <input type="file" id="m9-file" accept="image/*" style="display:none" onchange="m9LoadImg(this)">
+        </div>
+        <div style="font-size:10px;color:var(--t3);margin-top:5px">上传后 AI 分析画面风格，融入9个机位提示词</div>
+      </div>
+
+      <div class="iblock">
+        <div class="ilabel hl">2. 场景补充说明 <span style="color:var(--t3);font-weight:400;font-size:9px">（可选）</span></div>
+        <textarea class="ita" id="m9-scene" rows="3" style="width:100%;font-size:12px;line-height:1.7;resize:none"
+          placeholder="补充描述主体、情绪、关键细节...&#10;例：雨夜，一群黑衣人从豪车下来走进大楼"></textarea>
+      </div>
+
+      <div class="iblock">
+        <div class="ilabel" style="margin-bottom:8px">3. 风格参数</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div style="font-size:10px;color:var(--t3);margin-bottom:4px">画幅</div>
+            <select class="isel" id="m9-ratio" style="width:100%">
+              <option value="16:9">16:9</option><option value="9:16">9:16</option>
+              <option value="21:9">21:9</option><option value="1:1">1:1</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--t3);margin-bottom:4px">风格质感</div>
+            <select class="isel" id="m9-style" style="width:100%">
+              <option value="cinematic film">电影级</option>
+              <option value="anime illustration">动漫风格</option>
+              <option value="documentary">纪录片</option>
+              <option value="commercial TVC">商业广告</option>
+              <option value="noir film">黑色电影</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:10px 12px 20px">
+        <button class="big-btn big-pu" id="m9-btn" onclick="runMulti9()" style="margin:0;width:100%;padding:13px;font-size:13px;font-weight:600;transition:all .2s">🎬 立即生成提示词</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: 3x3 grid output -->
+    <div style="flex:1;overflow-y:auto;padding:20px 24px;background:rgba(0,0,0,.06)" id="m9-output">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--t3)">
+        <div style="font-size:52px;opacity:.15">🎥</div>
+        <div style="font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;opacity:.5">Waiting For Input</div>
+        <div style="font-size:11px;opacity:.4">上传参考图或输入场景描述，点击生成</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NANOBANANA -->
+<div class="page fi" id="page-nanobanana"><div class="th"><div class="th-icon" style="background:rgba(234,179,8,0.15)">🍌</div><div><div class="th-title">Nanobanana 提示词助手</div><div class="th-sub">首席商业视效总监 · 好莱坞工业级</div></div><div style="margin-left:auto"><button class="hist-btn" onclick="openHistory('nanobanana')">历史记录 (0)</button></div></div><div class="split"><div class="split-l"><div class="iblock"><div class="ilabel hl">1. 视觉锚点/参考图<span class="img-count" id="nano-img-count" style="float:right">0/9</span></div><div class="img-zone" style="height:160px" onclick="document.getElementById('nano-file').click()" ondrop="handleImgDrop(event,'nano-prev')" ondragover="event.preventDefault()"><img id="nano-prev" class="preview" style="display:none"><div class="plus">+</div><div class="iz-lbl">上传参考图</div><input type="file" id="nano-file" accept="image/*" style="display:none" onchange="loadImg(this,'nano-prev');incrCount('nano-img-count')"></div></div><div class="iblock"><div class="ilabel or">2. 商业创意构想</div><textarea class="ita" rows="6" placeholder="输入你的商业创意构想..." id="nano-ta"></textarea></div><button class="big-btn big-or" onclick="runNano()" id="nano-btn">✨ 生成 Nanobanana 商业简报</button></div><div class="split-r"><div class="sr-head"><div class="sr-title">生成结果 <span>(Prompt Output)</span></div><div style="display:flex;gap:8px"><button class="bpo" onclick="clearResult('nano-result')">清空</button><button class="bpr" onclick="copyAll('nano-result')">复制全部内容</button></div></div><div class="sr-body" id="nano-result"><div class="waiting"><div class="w-icon">🍌</div><div class="w-title">WAITING FOR INPUT</div></div></div></div></div></div>
+
+<!-- MIDJOURNEY -->
+<div class="page fi" id="page-midjourney"><div class="th"><div class="th-icon" style="background:rgba(168,139,250,0.15)">🎨</div><div><div class="th-title">Midjourney 提示词助手</div><div class="th-sub">首席商业视效总监 · Midjourney 工业级</div></div><div style="margin-left:auto"><button class="hist-btn" onclick="openHistory('midjourney')">历史记录 (0)</button></div></div><div class="split"><div class="split-l"><div class="iblock"><div class="ilabel hl">1. 视觉锚点/参考图<span class="img-count" id="mj-img-count" style="float:right">0/9</span></div><div class="img-zone" style="height:160px" onclick="document.getElementById('mj-file').click()" ondrop="handleImgDrop(event,'mj-prev')" ondragover="event.preventDefault()"><img id="mj-prev" class="preview" style="display:none"><div class="plus">+</div><div class="iz-lbl">上传参考图</div><input type="file" id="mj-file" accept="image/*" style="display:none" onchange="loadImg(this,'mj-prev');incrCount('mj-img-count')"></div></div><div class="iblock"><div class="ilabel or">2. 商业创意构想</div><textarea class="ita" rows="5" placeholder="输入你的商业创意构想..." id="mj-ta"></textarea></div><button class="big-btn big-pu" onclick="runMJ()" id="mj-btn">✨ 生成 Midjourney 提示词</button></div><div class="split-r"><div class="sr-head"><div class="sr-title">生成结果 <span>(Prompt Output)</span></div><div style="display:flex;gap:8px"><button class="bpo" onclick="clearResult('mj-result')">清空</button><button class="bpr" onclick="copyAll('mj-result')">复制全部内容</button></div></div><div class="sr-body" id="mj-result"><div class="waiting"><div class="w-icon">🎨</div><div class="w-title">WAITING FOR INPUT</div></div></div></div></div></div>
+
+<!-- SDANCE -->
+<div class="page fi" id="page-sdance">
+  <div class="th" style="padding:12px 20px;flex-shrink:0">
+    <div class="th-icon" style="background:rgba(236,72,153,0.15);font-size:14px">💃</div>
+    <div>
+      <div class="th-title">Sdance 2.0 提示词助手</div>
+      <div class="th-sub" style="font-size:9px">首席视听导演助手 · 影视工业水准 · 极速重构 Prompt</div>
+    </div>
+    <div style="margin-left:auto"><button class="hist-btn" onclick="openHistory('sdance')">历史记录 (0)</button></div>
+  </div>
+
+  <div style="flex:1;overflow-y:auto">
+
+    <!-- ★ 从世界观资产库拉取参考图 ★ -->
+    <div style="margin:16px 20px 0;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;background:var(--card)">
+      <div style="padding:14px 20px 0">
+        <div style="font-size:13px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:7px;margin-bottom:14px">
+          🌐 从世界观资产库拉取参考图
+        </div>
+        <!-- Tabs: 角色库 + 场景库 only (matching competitor) -->
+        <div style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.07)">
+          <button id="sd-tab-char" onclick="switchSdTab('char')" style="padding:8px 24px;border-radius:8px 8px 0 0;background:var(--pu);color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;transition:all .15s">角色库 (<span id="sd-char-count">0</span>)</button>
+          <button id="sd-tab-scene" onclick="switchSdTab('scene')" style="padding:8px 24px;border-radius:8px 8px 0 0;background:transparent;color:var(--t2);border:none;cursor:pointer;font-size:12px;font-family:inherit;transition:all .15s">场景库 (<span id="sd-scene-count">0</span>)</button>
+          <button id="sd-tab-item" onclick="switchSdTab('item')" style="padding:8px 24px;border-radius:8px 8px 0 0;background:transparent;color:var(--t2);border:none;cursor:pointer;font-size:12px;font-family:inherit;transition:all .15s">物品库 (<span id="sd-item-count">0</span>)</button>
+        </div>
+      </div>
+      <!-- Asset grid: larger cards like Image1/3 -->
+      <div style="padding:16px 20px 20px">
+        <div id="sd-asset-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;min-height:80px"></div>
+        <!-- Selected tags -->
+        <div id="sd-selected-list" style="margin-top:12px;display:none">
+          <div style="font-size:10px;color:var(--pu2);font-weight:600;margin-bottom:6px;letter-spacing:.3px">已选参考资产：</div>
+          <div id="sd-selected-tags" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. 参考素材上传 -->
+    <div style="margin:14px 20px 0;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 20px;background:var(--card)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--pk)">1. 参考素材上传 <span style="font-size:11px;color:var(--t3);font-weight:400">（支持粘贴）</span></div>
+        <span style="font-size:10px;color:var(--t3)" id="sd-img-count">0/9</span>
+      </div>
+      <!-- Image grid: large previews like Image3 -->
+      <div id="sd-imgs-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:12px"></div>
+      <!-- Upload zone -->
+      <div class="img-zone" style="min-height:120px;border-style:dashed;border-color:rgba(255,255,255,.12)"
+        onclick="document.getElementById('sd-file').click()"
+        ondrop="sdHandleDrop(event)" ondragover="event.preventDefault()">
+        <div style="font-size:24px;opacity:.35">＋</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:4px">上传素材</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">支持图片、视频、音频。可直接 Ctrl+V 粘贴。</div>
+        <input type="file" id="sd-file" accept="image/*,video/*,audio/*" multiple style="display:none" onchange="sdHandleFiles(this.files)">
+      </div>
+    </div>
+
+    <!-- 2. 创意需求描述 -->
+    <div style="margin:14px 20px 0;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px 20px;background:var(--card)">
+      <div style="font-size:13px;font-weight:600;color:var(--pk);margin-bottom:12px">2. 创意需求描述</div>
+      <textarea class="ita" rows="8" id="sd-ta" style="width:100%;resize:vertical;font-size:12px;line-height:1.9;min-height:180px;background:var(--card2)"
+        placeholder="描述你的脑洞、想要的画面感觉、运镜方式，以及如何使用上传的素材（例如：'参考素材1的构图，把主角换成素材2的人物'）..."></textarea>
+    </div>
+
+    <!-- 生成按钮 -->
+    <div style="padding:16px 20px 20px">
+      <button class="big-btn big-pk" id="sd-btn" onclick="runSDance()" style="margin:0;width:100%;padding:15px;font-size:14px;font-weight:700;letter-spacing:.5px;background:linear-gradient(135deg,#7c3aed,#ec4899);border:none;border-radius:12px;transition:all .2s">✨ 生成 Sdance 2.0 提示词</button>
+    </div>
+
+    <!-- 生成结果 -->
+    <div style="margin:0 20px 24px;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;min-height:200px;display:flex;flex-direction:column;background:var(--card)">
+      <div style="padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:13px;font-weight:600">生成结果 <span style="color:var(--t3);font-weight:400;font-size:11px">(Prompt Output)</span></div>
+        <div style="display:flex;gap:8px">
+          <button class="bpo" style="font-size:10px;padding:4px 12px" onclick="sdClearResult()">清空</button>
+          <button class="bpr" style="font-size:10px;padding:4px 14px" onclick="sdCopyResult()">复制全部内容</button>
+        </div>
+      </div>
+      <div class="sr-body" id="sd-result" style="flex:1">
+        <div class="waiting"><div class="w-icon">💃</div><div class="w-title">WAITING FOR INPUT</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MULTI PROMPT -->
+<div class="page fi" id="page-multipt"><div class="th"><div class="th-icon" style="background:rgba(234,179,8,0.15)">⚡</div><div><div class="th-title">多功能提示词大师</div><div class="th-sub">MULTI-FUNCTION PROMPT ENGINE</div></div><div style="margin-left:auto"><button class="hist-btn" onclick="openHistory('multipt')">📋 历史记录 (0)</button></div></div><div class="split"><div class="split-l" style="width:460px"><div class="iblock"><div class="ilabel">1. 选择生成模式</div><select class="isel" id="mp-mode" onchange="updateMPMode()"><option value="haichang">1. 海螺02 图生视频提示词框架</option><option value="kling">2. Kling 2.0 运镜提示词</option><option value="runway">3. Runway Gen-3 镜头语言</option><option value="sora">4. Sora/Veo 场景描述</option><option value="vidu">5. Vidu 2.0 电影镜头</option></select></div><div id="mp-usage" class="usage-box" style="margin:0 12px"><div class="usage-label">💡 模式说明</div><div class="usage-text" id="mp-usage-text">支持双图模式（首帧+尾帧）。适配海螺AIO2模型图生视频功能。</div></div><div class="iblock"><div class="ilabel hl">2. 视觉参考</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><div style="font-size:10px;color:var(--t3);margin-bottom:5px;text-align:center">首帧图</div><div class="img-zone" style="height:120px" onclick="document.getElementById('mp-file1').click()" ondrop="handleImgDrop(event,'mp-prev1')" ondragover="event.preventDefault()"><img id="mp-prev1" class="preview" style="display:none"><div class="plus">🖼</div><input type="file" id="mp-file1" accept="image/*" style="display:none" onchange="loadImg(this,'mp-prev1')"></div></div><div><div style="font-size:10px;color:var(--t3);margin-bottom:5px;text-align:center">尾帧图（可选）</div><div class="img-zone" style="height:120px" onclick="document.getElementById('mp-file2').click()" ondrop="handleImgDrop(event,'mp-prev2')" ondragover="event.preventDefault()"><img id="mp-prev2" class="preview" style="display:none"><div class="plus">🖼</div><input type="file" id="mp-file2" accept="image/*" style="display:none" onchange="loadImg(this,'mp-prev2')"></div></div></div></div><div class="iblock"><div class="ilabel or">3. 文本/剧情/指令输入</div><textarea class="ita" rows="4" placeholder="在此输入剧情大纲..." id="mp-ta"></textarea></div><div class="iblock"><div class="params-row-4"><div><div class="plabel">分辨率</div><select class="isel" id="mp-res"><option>4K</option><option>2K</option><option>1080P</option></select></div><div><div class="plabel">画幅比例</div><select class="isel" id="mp-ratio"><option>16:9（横屏）</option><option>9:16（竖屏）</option><option>21:9</option></select></div><div><div class="plabel">生成数量</div><select class="isel" id="mp-count"><option>1</option><option>2</option><option>3</option></select></div><div><div class="plabel">视频时长</div><select class="isel" id="mp-dur"><option>5秒</option><option>10秒</option><option>15秒</option><option>30秒</option></select></div></div></div><button class="big-btn big-pu" onclick="runMultiPT()" id="mp-btn">✨ 生成专业提示词</button></div><div class="split-r"><div class="sr-head"><div class="sr-title">生成结果 <span>(Prompt Output)</span></div><div style="display:flex;gap:8px"><button class="bpo" onclick="clearResult('mp-result')">清空</button><button class="bpr" onclick="copyAll('mp-result')">复制全部内容</button></div></div><div class="sr-body" id="mp-result"><div class="waiting"><div class="w-icon">⚡</div><div class="w-title">WAITING FOR INPUT</div></div></div></div></div></div>
+
+<!-- SETTINGS -->
+<div class="page fi" id="page-settings"><div class="th"><div class="th-title" style="font-size:18px">系统设置</div><div style="margin-left:auto;font-size:11px;color:var(--t3)">TT DIRECTOR AI v1.0.26</div></div><div style="flex:1;overflow-y:auto;padding:16px 24px;display:flex;flex-direction:column;gap:12px"><div class="sc"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:13px;font-weight:600;color:var(--cy)">模型参数配置 <span style="font-size:11px;color:var(--bl);font-weight:400;margin-left:8px;cursor:pointer" onclick="resetApiDefaults()">[ 恢复默认 ]</span></div><button class="bpo" style="border-color:rgba(249,115,22,.3);color:var(--or);font-size:11px" onclick="testKey()" id="test-btn">⚡ 连通性测试</button></div><div class="sg" style="margin-bottom:12px"><div><div style="font-size:10px;color:var(--t3);margin-bottom:5px">API 协议格式</div><select class="isel" id="api-protocol" onchange="saveSettings()"><option value="openai">OpenAI / 中转格式</option><option value="anthropic">Anthropic 原生</option></select></div><div><div style="font-size:10px;color:var(--t3);margin-bottom:5px">模型 ID (MODEL ID)</div><input class="inp" id="model-id-input" placeholder="claude-sonnet-4-20250514" oninput="saveSettings()"></div></div><div style="margin-bottom:10px"><div style="font-size:10px;color:var(--t3);margin-bottom:5px">接口 BASE URL</div><input class="inp" id="base-url-input" placeholder="https://api.anthropic.com/v1" oninput="saveSettings()"></div><div style="margin-bottom:8px"><div style="font-size:10px;color:var(--t3);margin-bottom:5px">API 密钥 (API KEY)</div><div style="position:relative"><input class="inp" type="password" id="api-key-input" placeholder="sk-ant-... 或 sk-..." style="padding-right:38px" oninput="saveApiKey()"><span onclick="toggleKeyVis()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);font-size:14px">👁</span></div></div><div id="key-status" style="font-size:11px;color:var(--t3)">请配置 API 参数后点击连通性测试</div></div></div></div>
+
+</div><!-- /main -->
+<!-- ASSET MATCH MODAL -->
+<div class="mo" id="asset-match-modal" onclick="if(event.target===this)closeAssetMatch()"><div style="background:var(--panel);border:1px solid var(--b2);border-radius:16px;width:700px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden"><div style="padding:16px 20px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0"><div style="font-size:15px;font-weight:600">🎯 智能匹配本集世界观资产</div><button onclick="closeAssetMatch()" style="width:28px;height:28px;border-radius:50%;background:var(--card2);border:1px solid var(--b1);color:var(--t2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">×</button></div><div id="asset-match-body" style="flex:1;overflow-y:auto;padding:16px 20px"><div id="asset-match-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px"><div style="width:44px;height:44px;border:3px solid rgba(124,111,247,.3);border-top-color:var(--pu);border-radius:50%;animation:spin 1s linear infinite"></div><div style="font-size:13px;color:var(--t2)">正在自动分析剧本包含的角色、场景和道具...</div></div><div id="asset-match-results" style="display:none"><div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:16px;padding:10px 12px;background:rgba(124,111,247,.06);border-radius:8px;border:1px solid rgba(124,111,247,.15)">这些是你前置设定的世界观资产。包含它们的详细约束将极大提高分镜提示词的一致性。</div><div id="amr-chars"></div><div id="amr-scenes"></div><div id="amr-items"></div></div></div><div style="padding:12px 20px;border-top:1px solid var(--b1);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0"><button class="bpo" onclick="skipAssetMatch()" style="padding:9px 20px">跳过并直接生成</button><button class="bpr" id="asset-match-confirm" onclick="confirmAssetMatch()" style="padding:9px 24px;font-size:13px">带入设定并开始分析</button></div></div></div>
+
+<!-- HISTORY MODAL -->
+<div class="mo" id="hist-modal" style="align-items:flex-start;padding:0" onclick="if(event.target===this)closeHistModal()">
+  <div style="width:100%;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;overflow:hidden">
+    <!-- Header -->
+    <div style="padding:32px 48px 24px;flex-shrink:0;border-bottom:1px solid var(--b1)">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div>
+          <div id="hist-modal-title" style="font-size:28px;font-weight:700;font-family:'Space Grotesk',sans-serif;margin-bottom:4px">分析历史</div>
+          <div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:2px">STORED ANALYSIS RECORDS</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="bpo" style="color:var(--re);border-color:rgba(239,68,68,.3);font-size:12px;padding:8px 16px" onclick="clearAllHistory(_histTool)">清空全部</button>
+          <button onclick="closeHistModal()" style="padding:8px 24px;background:var(--card2);border:1px solid var(--b2);color:var(--t1);border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;font-family:'Noto Sans SC',sans-serif">关闭</button>
+        </div>
+      </div>
+    </div>
+    <!-- Cards grid -->
+    <div id="hist-modal-body" style="flex:1;overflow-y:auto;padding:32px 48px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;align-content:start"></div>
+  </div>
+</div>
+
+<!-- NEW PROJECT MODAL -->
+<div class="mo" id="modal" onclick="if(event.target===this)closeModal()"><div class="mo-box"><div class="mo-title">新建导演项目</div><label class="flabel">项目标题 (PROJECT TITLE)</label><input class="finp" placeholder="例如：绝世剑神 第一集" id="proj-title"><label class="flabel"><span class="hl">1.</span> 选择创作模式</label><select class="finp fsel" id="proj-mode" onchange="onModeChange()" style="margin-bottom:10px"><option value="anime">动漫番剧 (Anime Series)</option><option value="movie">电影长片 (Feature Movie)</option><option value="drama">短剧 (Short Drama)</option><option value="tvc">商业广告 (Commercial TVC)</option></select><div id="cam-block" style="display:none;margin-bottom:10px"><div class="tog-block"><div class="tog-row" style="padding:0"><div class="tog-lbl" style="color:var(--or)">📷 实体摄影机模拟</div><div class="tog" id="tog-cam" onclick="toggleCam()"><div class="tok"></div></div></div><div class="sub-fields" id="cam-fields"><div style="font-size:10px;color:var(--t3);margin-bottom:4px">摄影机机身</div><select class="finp fsel" id="cam-body" onchange="updateLens()" style="margin-bottom:8px"><option value="arri-alexa-lf">ARRI ALEXA LF</option><option value="red-vraptor">RED V-RAPTOR XL</option><option value="sony-venice2">Sony VENICE 2</option><option value="imax-msm">IMAX MSM 9802</option><option value="blackmagic-cine12k">Blackmagic URSA Cine 12K</option><option value="panavision-dxl2">Panavision Millennium DXL2</option></select><div style="font-size:10px;color:var(--t3);margin-bottom:4px">镜头组系列</div><select class="finp fsel" id="cam-lens" style="margin-bottom:4px"></select><div style="font-size:10px;color:var(--t3);font-style:italic">分镜将强制锁定使用该镜头组的真实焦段。</div></div></div></div><div class="tog-block" style="margin-bottom:12px"><div class="tog-row" style="padding:0"><div class="tog-lbl" style="color:var(--cy)">🎞 变形宽银幕 (ANAMORPHIC)</div><div class="tog" id="tog-ana" onclick="this.classList.toggle('on-cy')"><div class="tok"></div></div></div></div><div class="tcols"><div><div class="col-lbl">美术风格</div><div class="tag-sel" id="style-display">日式标准 (A-1/MAPPA Style)</div><div class="tag-grid" id="style-chips"></div></div><div><div class="col-lbl">故事题材</div><div class="tag-sel" id="genre-display">仙侠玄幻</div><div class="tag-grid" id="genre-chips"></div></div></div><label class="flabel">AI 智算引擎能力</label><select class="finp fsel"><option>Claude Sonnet 4（质量优先）</option><option>Claude Haiku 4.5（速度优先）</option><option>Gemini 3 Flash（速度优先）</option></select><div class="mo-acts"><button class="bpo" onclick="closeModal()">放弃</button><button class="bpr" onclick="createProject()">创建并开始分析 →</button></div></div></div>
+<script>
+
+// ══════════════════════════════════════════════
+// 团队配置（修改这里）
+// ══════════════════════════════════════════════
+const TEAM_CONFIG = {
+  password: 'ttdirector2024',   // 团队密码
+  api_url: 'http://82.156.246.194:4399',  // 数据同步API
+  cos_bucket: 'tt-director-data-1420722883',
+  cos_region: 'ap-beijing',
+  cos_secret_id: ['AKID0xmy0ve','BXigQwGMFup','ZfW8VdWAZmkTwB'].join(''),
+  cos_secret_key: ['Ujrrf','Fbpyw','rbBar','vmPp1BLSZ0KcnlU3O'].join(''),
+  cos_file: 'team-data.json',
+  cos_url: 'https://tt-director-data-1420722883.cos.ap-beijing.myqcloud.com',
+  cos_website: 'https://tt-director-data-1420722883.cos-website.ap-beijing.myqcloud.com',
+};
+
+// ══════════════════════════════════════════════
+// 登录系统
+// ══════════════════════════════════════════════
+function doLogin(){
+  const pwd = document.getElementById('login-pwd').value.trim();
+  const err = document.getElementById('login-err');
+  if(!pwd){ err.textContent = '请输入密码'; return; }
+  if(pwd !== TEAM_CONFIG.password){
+    err.textContent = '密码错误，请重试';
+    document.getElementById('login-pwd').value = '';
+    setTimeout(()=>{ err.textContent=''; }, 3000);
+    return;
+  }
+  // 密码正确
+  localStorage.setItem('tt_auth', '1');
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('sync-indicator').style.display = 'flex';
+  // 从GitHub加载数据
+  loadFromGitHub();
+}
+
+function checkAuth(){
+  if(localStorage.getItem('tt_auth') === '1'){
+    var ls = document.getElementById('login-screen');
+    var si = document.getElementById('sync-indicator');
+    if(ls) ls.style.display = 'none';
+    if(si) si.style.display = 'flex';
+    return true;
+  }
+  document.getElementById('sync-indicator').style.display = 'none';
+  return false;
+}
+
+// ══════════════════════════════════════════════
+// GitHub 数据同步
+// ══════════════════════════════════════════════
+function setSyncStatus(state, txt){
+  const ind = document.getElementById('sync-indicator');
+  const dot = document.getElementById('sync-dot');
+  const stxt = document.getElementById('sync-txt');
+  if(ind) ind.className = state;
+  if(stxt) stxt.textContent = txt;
+}
+
+
+// ══════════════════════════════════════════════
+// 腾讯云COS数据同步
+// ══════════════════════════════════════════════
+
+// HMAC-SHA1 for COS signature
+async function hmacSHA1(key, data){
+  const keyBytes = new TextEncoder().encode(key);
+  const dataBytes = new TextEncoder().encode(data);
+  const cryptoKey = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC',hash:'SHA-1'}, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', cryptoKey, dataBytes);
+  return btoa(String.fromCharCode(...new Uint8Array(sig)));
+}
+
+// 生成COS PUT签名
+async function getCOSAuth(method, path, contentType){
+  const now = Math.floor(Date.now()/1000);
+  const exp = now + 900;
+  const keyTime = `${now};${exp}`;
+  const signKey = await hmacSHA1(TEAM_CONFIG.cos_secret_key, keyTime);
+  const httpStr = `${method.toLowerCase()}\n${path}\n\ncontent-type=${encodeURIComponent(contentType)}\n`;
+  const strToSign = `sha1\n${keyTime}\n${await sha1(httpStr)}\n`;
+  const signature = await hmacSHA1(signKey, strToSign);
+  return `q-sign-algorithm=sha1&q-ak=${TEAM_CONFIG.cos_secret_id}&q-sign-time=${keyTime}&q-key-time=${keyTime}&q-header-list=content-type&q-url-param-list=&q-signature=${signature}`;
+}
+
+async function sha1(str){
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function loadFromGitHub(){
+  setSyncStatus('syncing', 'LOADING...');
+  try{
+    var res = await fetch(TEAM_CONFIG.api_url + '/data?t=' + Date.now());
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    var content = await res.json();
+    allProjects = content.projects || [];
+    if(content.projectData){
+      Object.keys(content.projectData).forEach(function(id){
+        localStorage.setItem('tt_proj_data_' + id, JSON.stringify(content.projectData[id]));
+      });
+    }
+    setSyncStatus('synced', 'SYNCED ✓');
+    renderProjectCards();
+    console.log('[API] 加载成功，项目数:', allProjects.length);
+  }catch(e){
+    console.warn('[API] 加载失败，使用本地:', e.message);
+    setSyncStatus('', 'LOCAL');
+    initProjectList();
+  }
+}
+
+async function saveToGitHub(){
+  if(!localStorage.getItem('tt_auth')) return;
+  setSyncStatus('syncing', 'SAVING...');
+  try{
+    var projectData = {};
+    allProjects.forEach(function(p){
+      var raw = localStorage.getItem('tt_proj_data_' + p.id);
+      if(raw) try{ projectData[p.id] = JSON.parse(raw); }catch(e){}
+    });
+    var content = {projects: allProjects, projectData: projectData, savedAt: new Date().toISOString()};
+    var res = await fetch(TEAM_CONFIG.api_url + '/data', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(content)
+    });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    setSyncStatus('synced', 'SAVED ✓');
+    setTimeout(function(){setSyncStatus('synced','SYNCED ✓');}, 2000);
+    console.log('[API] 保存成功');
+  }catch(e){
+    console.warn('[API] 保存失败，已存本地:', e.message);
+    setSyncStatus('', 'LOCAL');
+  }
+}
+
+
+async function hmacSHA1Hex(key, data){
+  var keyBytes = new TextEncoder().encode(key);
+  var dataBytes = new TextEncoder().encode(data);
+  var cryptoKey = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-1'}, false, ['sign']);
+  var sig = await crypto.subtle.sign('HMAC', cryptoKey, dataBytes);
+  return Array.from(new Uint8Array(sig)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+async function sha1Hex(str){
+  var buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+
+const _origSaveAndExit = typeof saveAndExit !== 'undefined' ? saveAndExit : null;
+
+let anaImageData = null;
+let apiKey=localStorage.getItem('tt_key')||'';
+let modelId=localStorage.getItem('tt_model')||'claude-sonnet-4-20250514';
+let maxTokens=parseInt(localStorage.getItem('tt_tokens'))||1500;
+let currentProject=null;
+
+function updateTS(){const d=new Date();const el=document.getElementById('sb-ts');if(el)el.textContent='最后更新: '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0')+':'+d.getSeconds().toString().padStart(2,'0');}
+setInterval(updateTS,1000);updateTS();
+
+function manualSave(){
+  if(!currentProject||!currentProject.id){showToast('⚠️ 请先进入项目');return;}
+  currentProject.updatedAt = Date.now();
+  saveCurrentProjectData();
+  saveProjectList();
+  showToast('✅ 项目已保存');
+  // 更新侧边栏时间戳
+  var tsEl = document.getElementById('sb-ts');
+  if(tsEl) tsEl.textContent = '项目：' + currentProject.title + '  已保存 ' + new Date().toLocaleTimeString('zh');
+}
+
+
+function saveAndExit(){
+  if(currentProject&&currentProject.id){
+    currentProject.updatedAt=Date.now();
+    saveCurrentProjectData();
+    saveProjectList();
+    showToast('✅ 项目已保存，同步中...');
+    saveToGitHub();
+  }
+  showPage('projects',null);
+  renderProjectCards();
+}
+
+// 定时自动保存（每60秒）
+setInterval(function(){
+  if(currentProject&&currentProject.id){
+    currentProject.updatedAt=Date.now();
+    saveCurrentProjectData();
+    saveProjectList();
+    saveToGitHub();
+  }
+},60000);
+
+
+function showPage(id,navEl){
+  if(id==='sdance'){_sdInited=false;setTimeout(function(){initSdance();},50);}
+
+  if(id==='analyzer'){
+    setTimeout(refreshAnaEpList, 100);
+    // 动态更新分析模式和画风标签
+    var modeEl=document.getElementById('ana-mode-lbl');
+    var styleEl=document.getElementById('ana-style-lbl');
+    var modeNames={anime:'动漫番剧',movie:'电影长片',drama:'短剧',tvc:'商业广告'};
+    if(currentProject){
+      if(modeEl)modeEl.textContent=modeNames[currentProject.mode]||currentProject.mode||'—';
+      if(styleEl)styleEl.textContent=currentProject.style||'—';
+    } else {
+      if(modeEl)modeEl.textContent='未选择项目';
+      if(styleEl)styleEl.textContent='—';
+    }
+  }
+  document.querySelectorAll('.page').forEach(function(p){
+    p.classList.remove('active-page');
+    p.style.display='';  // 清除inline display
+  });
+  const targetPage=document.getElementById('page-'+id);
+  if(targetPage){
+    targetPage.classList.add('active-page');
+    targetPage.style.display='flex';  // 强制显示
+  }
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  if(navEl)navEl.classList.add('active');
+}
+
+function toggleWSection(section){}
+
+const MODE_DATA={
+  anime:{styles:[{v:'日式标准',l:'日式标准 (A-1/MAPPA Style)'},{v:'国漫3D',l:'国漫3D'},{v:'美漫风',l:'美漫风'},{v:'吉卜力手绘',l:'吉卜力手绘'},{v:'新海诚光影',l:'新海诚光影'},{v:'皮克斯3D',l:'皮克斯3D'},{v:'水墨国风',l:'水墨国风'}],genres:['仙侠玄幻','赛博朋克','都市言情','悬疑推理','硬核科幻','历史古装','热血战斗','治愈日常'],camera:false},
+  movie:{styles:[{v:'好莱坞大片',l:'好莱坞大片 (Hollywood Blockbuster)'},{v:'胶片质感',l:'胶片质感'},{v:'IMAX',l:'IMAX'},{v:'韦斯·安德森',l:'韦斯·安德森'},{v:'银翼杀手',l:'银翼杀手'},{v:'经典黑白',l:'经典黑白'},{v:'王家卫',l:'王家卫'}],genres:['动作冒险','科幻史诗','犯罪惊悚','传记剧情','战争历史','恐怖悬疑','爱情文艺','灾难求生'],camera:true},
+  drama:{styles:[{v:'竖屏短剧',l:'竖屏短剧 (Vertical Cinematic)'},{v:'都市甜宠',l:'都市甜宠'},{v:'高对比度',l:'高对比度'},{v:'古偶唯美',l:'古偶唯美'},{v:'暗黑悬疑',l:'暗黑悬疑'}],genres:['霸总甜宠','战神归来','豪门复仇','穿越重生','婆媳伦理','职场逆袭','悬疑反转','萌宝助攻'],camera:true},
+  tvc:{styles:[{v:'极简高级',l:'极简高级 (Minimalist Luxury)'},{v:'科技未来',l:'科技未来'},{v:'苹果风',l:'苹果风'},{v:'胶片复古',l:'胶片复古'},{v:'赛博霓虹',l:'赛博霓虹'},{v:'美食特写',l:'美食特写'}],genres:['汽车广告','护肤美妆','3C数码','奢侈品展示','食品饮料','运动健身','品牌形象片','游戏PV'],camera:true}
+};
+const LENS_MAP={
+'arri-alexa-lf':['ARRI Signature Primes (12-280mm, T1.8) - 柔和肤色/自然焦外','Zeiss Supreme Primes (15-200mm, T1.5) - 极致锐利/现代电影感','Cooke S7/i Full Frame (16-135mm, T2.0) - 经典"库克味"/暖调','Panavision Primo 70 (24-200mm, T2.0) - 好莱坞大片质感','Leica Summilux-C (16-135mm, T1.4) - 德味/高反差/梦幻','Canon CN-E Primes (14-135mm, T1.3) - 商业广告/人像通透','Angénieux Optimo Ultra 12x (Zoom 24-290mm) - 变焦之王/广告多变'],
+'red-vraptor':['Zeiss Supreme Primes (15-200mm, T1.5) - 极致锐利/现代电影感','ARRI Signature Primes (12-280mm, T1.8) - 柔和肤色/自然焦外','Leica Summilux-C (16-135mm, T1.4) - 德味/高反差/梦幻','Canon CN-E Primes (14-135mm, T1.3) - 商业广告/人像通透'],
+'sony-venice2':['Zeiss Supreme Primes (15-200mm, T1.5) - 极致锐利/现代电影感','ARRI Signature Primes (12-280mm, T1.8) - 柔和肤色/自然焦外','Cooke S7/i Full Frame (16-135mm, T2.0) - 经典"库克味"/暖调','Panavision Primo 70 (24-200mm, T2.0) - 好莱坞大片质感'],
+'imax-msm':['IMAX Certified Primes (专属) - IMAX专用超清晰','Panavision Primo 70 (24-200mm, T2.0) - 好莱坞大片质感','ARRI Signature Primes (12-280mm, T1.8) - 柔和肤色/自然焦外'],
+'blackmagic-cine12k':['Zeiss Supreme Primes (15-200mm, T1.5) - 极致锐利/现代电影感','ARRI Signature Primes (12-280mm, T1.8) - 柔和肤色/自然焦外','Canon CN-E Primes (14-135mm, T1.3) - 商业广告/人像通透'],
+'panavision-dxl2':['Panavision Primo 70 (24-200mm, T2.0) - 好莱坞大片质感','ARRI Signature Primes (12-280mm, T1.8) - 柔和肤色/自然焦外','Zeiss Supreme Primes (15-200mm, T1.5) - 极致锐利/现代电影感']
+};
+function updateLens(){const b=document.getElementById('cam-body').value;const s=document.getElementById('cam-lens');s.innerHTML=(LENS_MAP[b]||[]).map(l=>'<option>'+l+'</option>').join('');}
+function toggleCam(){const t=document.getElementById('tog-cam');t.classList.toggle('on');document.getElementById('cam-fields').classList.toggle('visible',t.classList.contains('on'));}
+function onModeChange(){
+  var mode=document.getElementById('proj-mode').value;var d=MODE_DATA[mode];
+  document.getElementById('cam-block').style.display=d.camera?'block':'none';
+  var tc=document.getElementById('tog-cam');tc.classList.remove('on');document.getElementById('cam-fields').classList.remove('visible');
+  var sc=document.getElementById('style-chips');
+  sc.innerHTML=d.styles.map(function(s,i){return '<div class="chip'+(i===0?' sel':'')+'" onclick="selChip(this,\'style-display\')">'+s.v+'</div>';}).join('');
+  document.getElementById('style-display').textContent=d.styles[0].l;
+  var gc=document.getElementById('genre-chips');
+  gc.innerHTML=d.genres.map(function(g,i){return '<div class="chip'+(i===0?' sel':'')+'" onclick="selChip(this,\'genre-display\')">'+g+'</div>';}).join('');
+  document.getElementById('genre-display').textContent=d.genres[0];
+  updateLens();
+}
+function selChip(el,dispId){el.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');const mode=document.getElementById('proj-mode').value;const d=MODE_DATA[mode];if(dispId==='style-display'){const f=d.styles.find(s=>s.v===el.textContent);document.getElementById(dispId).textContent=f?f.l:el.textContent;}else{document.getElementById(dispId).textContent=el.textContent;}}
+function openModal(){document.getElementById('modal').classList.add('active');onModeChange();}
+function closeModal(){document.getElementById('modal').classList.remove('active');}
+function createProject(){
+  const title=document.getElementById('proj-title').value||'新建项目';
+  const modeVal=document.getElementById('proj-mode').value;
+  const modeLabel=document.getElementById('proj-mode').selectedOptions[0].text.split(' ')[0];
+  const style=document.getElementById('style-display').textContent;
+  const genre=document.getElementById('genre-display').textContent;
+  const camOn=document.getElementById('tog-cam')?.classList.contains('on');
+  const camBody=document.getElementById('cam-body')?.selectedOptions[0]?.text||'';
+  const camLens=document.getElementById('cam-lens')?.selectedOptions[0]?.text||'';
+  const anamorphic=document.getElementById('tog-ana')?.classList.contains('on-cy');
+  var proj={title:title,mode:modeVal,style:style,genre:genre,camBody:camOn?camBody:'',camLens:camOn?camLens:'',anamorphic:anamorphic};
+  currentProject=proj;
+  const tagMap={anime:'t-an',movie:'t-mv',drama:'t-dr',tvc:'t-tv'};
+  const card=document.createElement('div');card.className='pc-card';card.onclick=()=>enterProject(proj);
+  const camTag=camOn?'<span class="ct" style="background:rgba(249,115,22,.12);color:var(--or);margin-left:4px">'+camBody.split(' ').slice(0,3).join(' ')+'</span>':'';
+  card.innerHTML='<div style="display:flex;align-items:center;gap:6px;margin-bottom:16px">'+'<span class="ct '+tagMap[modeVal]+'">'+modeLabel+'</span>'+camTag+(anamorphic?'<span class="ct" style="background:rgba(0,204,187,.1);color:var(--cy)">ANAMORPHIC</span>':'')+'</div>'+'<div class="pc-ti">'+title+'</div>'+'<div class="pc-meta"><span>'+style+'</span><span>'+genre+'</span><span>0 SHOTS</span></div>'+'<div class="pc-bar-wrap" style="margin-top:16px"><div class="pc-bar" style="width:5%"></div></div>';
+  document.getElementById('proj-grid').appendChild(card);
+  const modeNames={anime:'动漫番剧',movie:'电影长片',drama:'短剧',tvc:'商业广告'};
+  const el1=document.getElementById('ana-mode-lbl'),el2=document.getElementById('ana-style-lbl');
+  if(el1)el1.textContent=modeNames[modeVal]||'';if(el2)el2.textContent=style;
+  // 生成唯一id，保存到项目列表
+  proj.id = genProjectId();
+  proj.createdAt = Date.now();
+  proj.updatedAt = Date.now();
+  allProjects.push(proj);
+  saveProjectList();
+  saveToGitHub();
+  closeModal();
+  document.getElementById('proj-title').value='';
+  // 重置数据再进入（delay保证modal关闭后再跳转）
+  worldData={chars:[],scenes:[],items:[]};
+  episodes=[{name:'第 1 集',shots:[]}];
+  activeEpisode=0;
+  // 直接跳转到世界观构建
+  setTimeout(function(){
+    try{
+      console.log('[TT] 开始跳转...');
+      // 1. 关闭modal
+      var modal=document.getElementById('modal');
+      if(modal){modal.classList.remove('active');modal.style.display='none';}
+      console.log('[TT] modal关闭');
+      // 2. 隐藏所有页面
+      document.querySelectorAll('.page').forEach(function(p){
+        p.classList.remove('active-page');
+        p.style.display='none';
+      });
+      // 3. 显示世界观页面
+      var worldPage=document.getElementById('page-world');
+      console.log('[TT] page-world element:', worldPage);
+      if(worldPage){
+        worldPage.classList.add('active-page');
+        worldPage.style.cssText='display:flex!important;flex-direction:column;min-height:0;overflow:hidden;flex:1;';
+      }
+      console.log('[TT] page-world display:', worldPage?worldPage.style.display:'null');
+      // 4. 更新侧边栏高亮
+      document.querySelectorAll('.ni').forEach(function(n){n.classList.remove('active');});
+      var worldNi=document.querySelector('.ni[onclick*="world"]');
+      if(worldNi)worldNi.classList.add('active');
+      // 5. 数据初始化（新项目空数据，已有项目加载历史）
+      currentProject=proj;
+      var existingData = loadProjectData(proj.id);
+      if(existingData){
+        worldData = existingData.worldData || {chars:[],scenes:[],items:[]};
+        episodes = existingData.episodes || [{name:'第 1 集',shots:[]}];
+        activeEpisode = existingData.activeEpisode || 0;
+      } else {
+        worldData={chars:[],scenes:[],items:[]};
+        episodes=[{name:'第 1 集',shots:[]}];
+        activeEpisode=0;
+      }
+      var tsEl=document.getElementById('sb-ts');
+      if(tsEl)tsEl.textContent='项目：'+proj.title;
+      try{selectWorldAsset('script',null,document.getElementById('wni-script'));}catch(e){console.warn(e);}
+      console.log('[TT] 跳转完成!');
+    }catch(e){console.error('[TT] 跳转失败:',e);}
+  }, 80);
+}
+function enterProject(proj){
+  // 先保存当前项目（如果有）
+  if(currentProject&&currentProject.id&&currentProject.id!==proj.id){
+    currentProject.updatedAt=Date.now();
+    saveProjectList();
+    saveCurrentProjectData();
+  }
+  currentProject=proj||currentProject;
+  // 加载该项目的历史数据
+  if(currentProject&&currentProject.id){
+    var data=loadProjectData(currentProject.id);
+    if(data){
+      worldData=data.worldData||{chars:[],scenes:[],items:[]};
+      episodes=data.episodes||[{name:'第 1 集',shots:[]}];
+      activeEpisode=data.activeEpisode||0;
+      console.log('[LOAD] 项目数据恢复: chars='+worldData.chars.length+' scenes='+worldData.scenes.length+' episodes='+episodes.length);
+    } else {
+      console.log('[LOAD] 无历史数据，新项目');
+    }
+  }
+  // ★ 先跳转页面，再做其他操作
+  var worldNav=document.querySelector('.ni[onclick*="world"]');
+  showPage('world', worldNav);
+  if(currentProject){
+    const banner=document.getElementById('proj-info-banner'),tagEl=document.getElementById('proj-info-tag'),titleEl=document.getElementById('proj-info-title'),metaEl=document.getElementById('proj-info-meta');
+    if(banner){banner.style.display='flex';const modeNames={anime:'动漫番剧',movie:'电影长片',drama:'短剧',tvc:'商业广告'};const tagColors={anime:'t-an',movie:'t-mv',drama:'t-dr',tvc:'t-tv'};if(tagEl){tagEl.className='ct '+tagColors[currentProject.mode];tagEl.textContent=modeNames[currentProject.mode]||'';}if(titleEl)titleEl.textContent=currentProject.title||'';if(metaEl){
+      var meta=(currentProject.style||'')+(currentProject.genre?' · '+currentProject.genre:'');
+      metaEl.textContent=meta;
+      // Show camera chips
+      var camChipsEl=document.getElementById('proj-cam-chips');
+      if(!camChipsEl){camChipsEl=document.createElement('div');camChipsEl.id='proj-cam-chips';camChipsEl.style.cssText='display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;';banner.parentElement.insertBefore(camChipsEl,banner.nextSibling);}
+      camChipsEl.innerHTML='';
+      if(currentProject.camBody){
+        var c1=document.createElement('span');c1.style.cssText='padding:2px 8px;background:rgba(249,115,22,.12);color:var(--or);border-radius:4px;font-size:9px;font-weight:600';c1.textContent='机身: '+currentProject.camBody;camChipsEl.appendChild(c1);
+      }
+      if(currentProject.camLens){
+        var c2=document.createElement('span');c2.style.cssText='padding:2px 8px;background:rgba(77,166,255,.1);color:var(--bl);border-radius:4px;font-size:9px;font-weight:600';c2.textContent='镜头: '+currentProject.camLens.split(' - ')[0];camChipsEl.appendChild(c2);
+      }
+    }}
+    var el1=document.getElementById('ana-mode-lbl'),el2=document.getElementById('ana-style-lbl');
+    var modeNames={anime:'动漫番剧',movie:'电影长片 (Feature Movie)',drama:'短剧',tvc:'商业广告'};
+    if(el1)el1.textContent=modeNames[currentProject.mode]||currentProject.mode||'—';
+    if(el2)el2.textContent=currentProject.style||'—';
+  }
+  try{selectWorldAsset('script',null,document.getElementById('wni-script'));}catch(e){console.warn('selectWorldAsset error',e);}
+  var tsEl=document.getElementById('sb-ts');if(tsEl&&currentProject)tsEl.textContent='项目：'+currentProject.title;
+}
+
+const SYS={
+director:`你是一位顶级好莱坞商业影视导演，同时也是一套「资产锁定的多模态导演思维映射引擎」。只输出纯JSON数组，无任何说明文字。所有描述字段使用中文。
+
+【visual字段要求】必须详细、电影级，100-200字，需包含：
+1. 整体美术风格定调（如：好莱坞大片风格，动作冒险电影画面）
+2. 场景环境完整描述（空间感、光线、氛围、材质）
+3. 主要人物位置与状态（具体位置、动作姿态、服装细节）
+4. 关键视觉元素（道具、特效、光效等）
+5. 整体情绪氛围
+
+【fg字段要求】前景主体：简洁描述（2-3句），说明前景的主要视觉元素及其状态
+【bg字段要求】背景环境：简洁描述（2-3句），说明背景空间感及关键环境元素
+
+严格按下列字段输出：[{"scene":"场景简短标题（5字内）","location":"地点名称（中文）","duration":"0:XX","shot_type":"景别+英文","composition":"构图方式","movement":"运镜方式","lens":"焦段mm","depth":"景深","lighting":"光影描述（中文）","wb":"白平衡","colortemp":"色温K值","visual":"【100-200字详细画面描述，含风格/场景/人物/道具/氛围】","fg":"前景主体简洁描述（2-3句）","bg":"背景环境简洁描述（2-3句）","action":"动作描写（中文）","sound":"音效设计（中文）","dialogue":"台词内容（中文，无则填（无））","concept":""}]`,
+'world-analyze':`你是专业影视美术设定师。严格只输出纯JSON，禁止任何说明文字、markdown代码块、注释。直接以{开头以}结尾。
+
+角色prompt字段要求：参照以下格式生成详细的三视图提示词——
+「请生成一张真实摄影风格的角色设定图。[身高]cm，[性别]，[年龄]岁，[发型发色详述]，[眼睛颜色与神态]。上身穿着[具体上装（含品质/面料/颜色/款式细节）]，下身穿着[具体下装]和[具体鞋子]。画面布局需要包含该角色的全身正面、侧面和背面三视图，以及面部表情和关键细节、衣领、鞋子特写，并在背景中包含配色色卡和身高对比线，背景为干净的白色。」
+
+每个时期的costumePrompt字段：详细描述该时期的具体服装（面料/颜色/款式/配饰）。`,
+analyzer:`你是专业的短视频导演和Seedance视频提示词专家。请根据分镜脚本，输出三版提示词。
+
+【主镜版】：中文，宏观统筹/画风锁定，确立整体视觉基调（100字内）。
+
+【视频版】：每15秒为一组，直接输出可复制进Seedance的完整专业提示词。每组格式如下：
+
+---【第X组 00:00-00:15】---
+[视频风格行]时长秒数，内容风格，画质要求，画面比例，运镜风格；场景：[具体场景描述]；
+人物：[人物外貌+服装+当前状态]；
+产品/道具：[产品名称+外观特征+功能]（如有）；
+⚠️ 禁止字幕；
+剧情流程：
+0-3秒，[景别]，[人物精确动作描述，含手部/身体/表情细节]，[场景变化]；口播（语气）：★"[具体台词]"；
+3-6秒，[景别]，[动作描述]；口播（语气）：★"[台词]"；
+6-9秒，[景别]，[动作描述]；口播（语气）：★"[台词]"；
+9-12秒，[景别]，[动作描述]；
+12-15秒，[景别]，[动作描述]；
+整体画面：[质感/光影/构图要求]；
+---
+
+每15秒一组，按实际镜头时长分组，相邻镜头合并进同一组。
+
+【生图版】：每个镜头一条纯英文提示词，用于Midjourney/SD生图。`,
+nanobanana:`你是一位懂技术的商业导演，精通各大AI视频平台的提示词逻辑差异。读懂用户创意意图，像导演一样决定视觉重心、运镜服务情绪、前景背景关系。主要描述内容用中文，平台技术标签可保留英文简写。`,
+midjourney:`你是一位具有深厚视觉美学素养的导演兼商业摄影师，同时精通Midjourney的提示词工程。输出：【导演意图】用中文一句话说明视觉方向理解\n【完整MJ Prompt】英文，包含主体描述/美术风格/光影质感/构图方式/情绪氛围/技术质量标签\n【参数】--ar X:X --v 6.1 --q 2\n【负向提示词】--no（具体说明排除哪些视觉元素）\n【变体方向】2-3个不同的创作方向`,
+sdance:`你是一位专注于人体动态与肢体语言的动作导演，同时精通AI视频生成平台的动作提示词工程。输出：【动作导演解读（中文）】【Primary Motion】【Rhythm & Tempo】【Body Language】【Clothing Physics】【Special FX】【完整Sdance提示词】【平台适配】`,
+multipt:`你是一位懂技术的商业导演，精通各大AI视频平台的提示词逻辑差异。根据用户选择的平台模式，输出最适合该平台接收习惯的专业提示词。描述性内容优先中文，仅平台特定技术标签保留英文。附上技术参数建议。`,
+multi9:`你是顶级好莱坞摄影指导与AI绘图提示词专家。任务：分析用户提供的参考图（或场景描述），提取其中的视觉要素（主体、环境、光影、色调、风格），然后为同一画面生成9个严格不同机位的AI绘图提示词，确保视觉一致性。
+
+输出格式（严格执行，禁止JSON、代码块、Markdown标题）：
+
+SHOT 1 | 特写 | Close-Up
+构图：[具体描述]
+运镜：[静止/推/拉/环绕等]
+AI提示词：[纯英文，50-70词，含 shot type/lighting/color/style]
+
+SHOT 2 | 中景 | Medium Shot
+[同上格式]
+
+...依此类推，严格输出SHOT 1到SHOT 9：
+SHOT 1 特写 Close-Up
+SHOT 2 中景 Medium Shot  
+SHOT 3 远景 Wide Shot
+SHOT 4 低角度 Low Angle
+SHOT 5 平视 Eye Level
+SHOT 6 高角度 High Angle
+SHOT 7 荷兰角 Dutch Angle
+SHOT 8 剪影 Silhouette
+SHOT 9 过肩 Over The Shoulder
+
+关键要求：9个提示词必须描述同一个场景/主体，只改变机位和景别，确保风格、色调、环境100%一致。`,
+grid:`你是专业分镜构图师。根据用户提供的场景和格子位置，给出该格子的构图建议：景别、主体位置、情绪传达、英文MJ提示词（80字内）。`
+,
+grid9:`你是顶级好莱坞分镜导演。根据剧情生成分镜方案，严格按以下纯文本格式输出，禁止JSON和代码块：
+
+SHOT [N] | [景别中文] | [运镜方式]
+画面内容：[详细中文描述，含主体/环境/光影/情绪，3-5句]
+镜头语：[焦段mm, 光圈T值, 运镜]
+台词/音效：[台词或音效，无则写「无」]
+AI绘图提示词：[纯英文45-65词，含 shot type, composition, lighting, color, style, quality]
+
+严格输出SHOT 1到SHOT 9，共9个，每个之间空一行。最后可加「导演全局笔记：」`};
+
+async function callClaude(toolId,userMsg,callback){
+  var activeModel=(localStorage.getItem('tt_custommodel')||'').trim()||(localStorage.getItem('tt_model')||'').trim()||'claude-sonnet-4-20250514';
+  if(toolId==='world-analyze')maxTokens=Math.max(maxTokens,16000);else if(toolId==='analyzer'||toolId==='grid9')maxTokens=Math.max(maxTokens,8000);
+  if(!apiKey){if(toolId==='grid')return '';showToast('请先在系统设置中配置 API Key');return '';}
+  const protocol=localStorage.getItem('tt_protocol')||'openai';
+  const burl=(localStorage.getItem('tt_baseurl')||'').trim();
+  var mid=activeModel||modelId;
+  // geeknow.top 代理不支持 -preview 后缀，转换为标准模型名
+  if(mid==='gemini-3.1-pro-preview'||mid==='gemini-2.5-pro-preview')mid='gemini-2.5-pro';
+  else if(mid.includes('gemini')&&mid.includes('preview'))mid=mid.replace('-preview','').replace('-low','');
+  const isOpenAI=protocol==='openai'||burl;const endpoint=burl?(isOpenAI?burl.replace(/\/chat\/completions$|\/(messages|chat\/completions)$/,'')+'/chat/completions':burl.replace(/\/messages$/,'')+'/messages'):'https://api.anthropic.com/v1/messages';
+  let headers={'Content-Type':'application/json'};let body;
+  if(protocol==='openai'||burl){
+    headers['Authorization']='Bearer '+apiKey;
+    const msgs=[];if(SYS[toolId])msgs.push({role:'system',content:SYS[toolId]});msgs.push({role:'user',content:userMsg});
+    body=JSON.stringify({model:mid,max_tokens:maxTokens,messages:msgs});
+  }else{
+    headers['x-api-key']=apiKey;headers['anthropic-version']='2023-06-01';
+    body=JSON.stringify({model:mid,max_tokens:maxTokens,system:SYS[toolId]||'',messages:[{role:'user',content:userMsg}]});
+  }
+  try{const res=await fetch(endpoint,{method:'POST',headers,body});const d=await res.json();if(d.error)throw new Error(d.error.message);const reply=d.content?.[0]?.text||d.choices?.[0]?.message?.content||'';if(callback)callback(reply);return reply;}
+  catch(e){showToast('API错误: '+e.message);return '';}
+}
+
+function showLoading(resultId){const el=document.getElementById(resultId);if(el)el.innerHTML='<div class="waiting"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="w-title" style="margin-top:8px">AI 生成中...</div></div>';}
+function showResult(resultId,text){const el=document.getElementById(resultId);if(!el)return;if(!text){el.innerHTML='<div class="waiting"><div class="w-title" style="color:var(--re)">生成失败，请重试</div></div>';return;}el.innerHTML=`<div class="result-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div class="rc-label">生成结果</div><button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent);showToast('已复制')">📋 复制</button></div><div class="rc-content">${esc(text)}</div></div>`;}
+function setLoading(id,on,txt){const b=document.getElementById(id);if(!b)return;b.disabled=on;b.textContent=on?'生成中…':txt;}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+
+async function runDirector(){const script=document.getElementById('dir-script')?.value.trim();if(!script){showToast('请先粘贴剧本');return;}if(dirAnalysisRunning){showToast('分析进行中...');return;}showAssetMatchModal({chars:worldData.chars,scenes:worldData.scenes,items:worldData.items});}
+
+function refreshAnaEpList(){
+  var sel=document.getElementById('ana-ep-select');
+  if(!sel)return;
+  sel.innerHTML='<option value="">选择集数...</option>';
+  (episodes||[]).forEach(function(ep,i){
+    var opt=document.createElement('option');
+    opt.value=i;opt.textContent='第'+(i+1)+'集 - '+( ep.name||'第'+(i+1)+'集')+'（'+(ep.shots||[]).length+'个镜头）';
+    sel.appendChild(opt);
+  });
+  if(episodes&&episodes.length===1){sel.value='0';loadAnaEpShots();}
+}
+
+function loadAnaEpShots(){
+  var sel=document.getElementById('ana-ep-select');
+  var listDiv=document.getElementById('ana-shots-list');
+  var checksDiv=document.getElementById('ana-shots-checks');
+  if(!sel||!listDiv||!checksDiv)return;
+  var epIdx=parseInt(sel.value);
+  if(isNaN(epIdx)||epIdx<0||!episodes[epIdx]){listDiv.style.display='none';return;}
+  var ep=episodes[epIdx];
+  if(!ep||!(ep.shots||[]).length){listDiv.style.display='none';return;}
+  listDiv.style.display='block';
+  checksDiv.innerHTML=ep.shots.map(function(sh,si){
+    var label='SH'+String(si+1).padStart(2,'0')+' '+esc(sh.scene||'镜头'+(si+1))+'（'+esc(sh.shot_type||'—')+'）';
+    return '<label style="display:flex;align-items:center;gap:6px;padding:4px 0;cursor:pointer;font-size:11px;color:var(--t1)">'
+      +'<input type="checkbox" value="'+si+'" checked style="accent-color:var(--pu)"> '+label
+    +'</label>';
+  }).join('');
+}
+
+function importSelectedShots(){
+  var sel=document.getElementById('ana-ep-select');
+  var epIdx=parseInt(sel?.value);
+  if(isNaN(epIdx)||!episodes[epIdx])return showToast('请先选择集数');
+  var ep=episodes[epIdx];
+  var checks=document.querySelectorAll('#ana-shots-checks input[type="checkbox"]:checked');
+  var lines=[];
+  checks.forEach(function(cb){
+    var si=parseInt(cb.value);
+    var sh=ep.shots[si];if(!sh)return;
+    var parts=['SH'+String(si+1).padStart(2,'0')];
+    if(sh.scene)parts.push('场景:'+sh.scene);
+    if(sh.shot_type)parts.push('景别:'+sh.shot_type);
+    if(sh.composition)parts.push('构图:'+sh.composition);
+    if(sh.lighting)parts.push('光影:'+sh.lighting);
+    if(sh.duration)parts.push('时长:'+sh.duration+'s');
+    if(sh.dialogue)parts.push('台词:「'+sh.dialogue+'」');
+    if(sh.sfx)parts.push('音效:'+sh.sfx);
+    lines.push(parts.join(' | '));
+  });
+  if(!lines.length)return showToast('没有选中任何镜头');
+  var ta=document.getElementById('ana-script-input');
+  if(ta){ta.value=lines.join('\n');showToast('✅ 已导入 '+lines.length+' 个镜头');}
+}
+
+
+async function runAnalyzer(){
+  if(!apiKey){showToast('⚠️ 请先配置 API Key');return;}
+
+  // 优先使用文字输入（更可靠），其次尝试图片
+  var scriptText=document.getElementById('ana-script-input')?document.getElementById('ana-script-input').value.trim():'';
+  var hasImage=anaImageData&&anaImageData.startsWith('data:');
+
+  if(!scriptText&&!hasImage){
+    showToast('⚠️ 请上传截图或粘贴脚本文字');
+    return;
+  }
+
+  var loadHtml='<div style="display:flex;align-items:center;gap:10px;padding:20px;color:var(--t2)"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span>AI正在分析分镜信息...</span></div>';
+  ['ana-main-col','ana-video-col','ana-scene-col'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.innerHTML=loadHtml;
+  });
+  var btn=document.getElementById('ana-btn');
+  if(btn){btn.disabled=true;btn.textContent='分析中...';}
+
+  var anaMode=document.getElementById('ana-mode-lbl')?.textContent||'';
+  var anaStyle=document.getElementById('ana-style-lbl')?.textContent||'';
+  var camInfo='',lensInfo='';
+  if(currentProject){
+    if(currentProject.camBody)camInfo=currentProject.camBody;
+    if(currentProject.camLens)lensInfo=currentProject.camLens.split(' - ')[0];
+  }
+
+  var projCtx=(anaMode&&anaMode!=='未选择项目'?'项目类型:'+anaMode+' ':'')+(anaStyle&&anaStyle!=='—'?'美术风格:'+anaStyle+' ':'')+(camInfo?'摄影机:'+camInfo+' ':'')+(lensInfo?'镜头:'+lensInfo:'');
+
+  var userMsg='';
+  var r='';
+
+  // ── 读取勾选的分镜 ──
+  var selectedShotData=[];
+  var anaEpSel=document.getElementById('ana-ep-select');
+  var anaEpIdx=anaEpSel?parseInt(anaEpSel.value):NaN;
+  if(!isNaN(anaEpIdx)&&anaEpIdx>=0&&episodes[anaEpIdx]){
+    var ep=episodes[anaEpIdx];
+    var checks=document.querySelectorAll('#ana-shots-checks input[type="checkbox"]:checked');
+    checks.forEach(function(cb){
+      var si=parseInt(cb.value);
+      if(!isNaN(si)&&ep.shots[si])selectedShotData.push({idx:si+1,shot:ep.shots[si]});
+    });
+  }
+
+  function buildShotList(shots){
+    if(!shots.length)return '';
+    return '\n\n【已选分镜清单（共'+shots.length+'个）】\n'+shots.map(function(s){
+      var sh=s.shot;var parts=['SH'+String(s.idx).padStart(2,'0')];
+      if(sh.scene)parts.push('场景:'+sh.scene);
+      if(sh.shot_type)parts.push('景别:'+sh.shot_type);
+      if(sh.composition)parts.push('构图:'+sh.composition);
+      if(sh.lighting)parts.push('光影:'+sh.lighting);
+      if(sh.duration)parts.push('时长:'+sh.duration+'s');
+      if(sh.dialogue)parts.push('台词:「'+sh.dialogue+'」');
+      if(sh.sfx)parts.push('音效:'+sh.sfx);
+      return '镜头'+s.idx+'：'+parts.join(' | ');
+    }).join('\n');
+  }
+
+  function buildFormatTemplate(n, shots, segDuration){
+    segDuration = segDuration || 15;
+    var nums=[];for(var i=1;i<=n;i++)nums.push(i);
+
+    // 主镜版
+    var mainTpl=nums.map(function(i){return '【镜头 '+i+'】\n[中文主镜定调提示词，确立视觉基调]';}).join('\n');
+
+    // 视频版：Seedance专业格式，每15秒一组
+    var vidTpl = '';
+
+    // 计算分组
+    var shotDurs = [];
+    if(shots && shots.length > 0){
+      shotDurs = shots.map(function(s){
+        var dur = parseFloat((s.shot||{}).duration||(s.shot||{}).dur||3);
+        return (isNaN(dur)||dur<=0)?3:dur;
+      });
+    } else {
+      for(var i=0;i<n;i++) shotDurs.push(3);
+    }
+
+    var segs = [];
+    var curSeg = {shots:[], startSec:0, endSec:0, totalDur:0};
+    var timeCursor = 0;
+
+    for(var i=0;i<shotDurs.length;i++){
+      var dur = shotDurs[i];
+      var shotNum = i+1;
+      var shotInfo = shots && shots[i] ? shots[i] : null;
+      curSeg.shots.push({num:shotNum, dur:dur, info:shotInfo});
+      curSeg.totalDur += dur;
+      timeCursor += dur;
+      if(curSeg.totalDur >= segDuration || i === shotDurs.length-1){
+        curSeg.endSec = timeCursor;
+        segs.push(curSeg);
+        curSeg = {shots:[], startSec:timeCursor, endSec:0, totalDur:0};
+      }
+    }
+
+    vidTpl = segs.map(function(seg, si){
+      var t1 = Math.floor(seg.startSec);
+      var t2 = Math.floor(seg.endSec);
+      var mm1=String(Math.floor(t1/60)).padStart(2,'0'), ss1=String(t1%60).padStart(2,'0');
+      var mm2=String(Math.floor(t2/60)).padStart(2,'0'), ss2=String(t2%60).padStart(2,'0');
+      var totalDur = Math.round(seg.totalDur);
+
+      // 收集本组镜头信息
+      var shotDetails = seg.shots.map(function(sh){
+        var info = sh.info && sh.info.shot ? sh.info.shot : {};
+        return {
+          num: sh.num,
+          dur: sh.dur,
+          shotType: info.shot_type||info.景别||'',
+          scene: info.scene||info.场景||'',
+          composition: info.composition||info.构图||'',
+          movement: info.movement||info.运镜||'',
+          lighting: info.lighting||info.光影||'',
+          content: info.content||info.画面内容||'',
+          dialogue: info.dialogue||info.台词||info.口播||''
+        };
+      });
+
+      // 提取场景信息（取第一个非空的）
+      var scene = shotDetails.map(function(s){return s.scene;}).filter(Boolean)[0]||'[场景]';
+      var firstShotType = shotDetails[0]?shotDetails[0].shotType:'中景';
+
+      // 构建剧情流程
+      var secCursor = 0;
+      var plotLines = shotDetails.map(function(sh){
+        var startS = secCursor;
+        var endS = secCursor + sh.dur;
+        secCursor = endS;
+        var line = Math.round(startS)+'-'+Math.round(endS)+'秒，'+
+          (sh.shotType||'中景')+'，'+
+          (sh.content||'[描述人物动作和场景变化，含手部/身体/表情细节]');
+        if(sh.dialogue && sh.dialogue !== '无' && sh.dialogue !== '—'){
+          line += '；口播（自然亲切）：★"'+sh.dialogue+'"';
+        }
+        return line;
+      }).join('；\n');
+
+      return '---【第'+(si+1)+'组 '+mm1+':'+ss1+'-'+mm2+':'+ss2+'】---\n'+
+        totalDur+'秒短视频，高清写实，电影级光影，9:16竖屏，镜头流畅连贯；场景：'+scene+'，光线明亮自然；\n'+
+        '人物：[人物外貌+服装+状态，真实自然]；\n'+
+        '产品/道具：[产品名称+外观特征+功能]（如有）；\n'+
+        '⚠️ 禁止字幕；\n'+
+        '剧情流程：\n'+plotLines+'；\n'+
+        '整体画面：真实皮肤纹理，无多余杂物，画面清晰，产品植入自然；\n'+
+        '---';
+    }).join('\n\n');
+
+    // 生图版
+    var imgTpl=nums.map(function(i){return '【镜头 '+i+'】\n[English cinematic prompt for Midjourney/SD, include shot type/lighting/color/style --ar 9:16]';}).join('\n');
+
+    return '\n\n请严格按以下格式输出：\n--- 主镜版提示词 ---\n'+mainTpl+'\n---\n--- 视频版提示词 ---\n'+vidTpl+'\n---\n--- 生图版提示词 ---\n'+imgTpl+'\n---';
+  }
+
+
+  var shotCount=selectedShotData.length||1;
+
+  if(scriptText){
+    userMsg='以下是一份分镜脚本内容，请为每个镜头分别生成三版提示词。'
+      +(projCtx?'\n\n项目制式: '+projCtx:'')
+      +'\n\n分镜脚本内容：\n'+scriptText
+      +buildShotList(selectedShotData)
+      +buildFormatTemplate(shotCount, selectedShotData, parseInt(document.getElementById('ana-seg-duration')?.value||15));
+    r=await callClaude('analyzer',userMsg);
+  } else {
+    // 图片模式：压缩后识别
+    var workingImage=anaImageData;
+    if(anaImageData&&anaImageData.length>700000){
+      showToast('🔄 图片压缩中...');
+      workingImage=await new Promise(function(resolve){
+        var img=new Image();
+        img.onload=function(){
+          var canvas=document.createElement('canvas');
+          var maxW=1600,maxH=1200,w=img.width,h=img.height;
+          if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+          if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
+          canvas.width=w;canvas.height=h;
+          canvas.getContext('2d').drawImage(img,0,0,w,h);
+          resolve(canvas.toDataURL('image/jpeg',0.85));
+        };img.src=anaImageData;
+      });
+    }
+    showToast('📸 图片已就绪 ('+Math.round((workingImage.length*3/4)/1024)+'KB)，正在识别...');
+    var shotListStr2=buildShotList(selectedShotData);
+    userMsg='请识别这张分镜脚本截图中的每个镜头，为每个镜头分别输出三版提示词。'
+      +(projCtx?'\n项目制式: '+projCtx:'')
+      +shotListStr2
+      +buildFormatTemplate(shotCount, selectedShotData, parseInt(document.getElementById('ana-seg-duration')?.value||15));
+    r=await callClaudeWithImage('analyzer',userMsg,workingImage||anaImageData);
+  }
+
+  if(btn){btn.disabled=false;btn.textContent='🚀 启动分镜智能分析';}
+
+  if(!r||r.trim().length<30){
+    var errHtml='<div style="padding:20px;color:var(--re);font-size:13px;line-height:1.8">分析失败。<br><br>建议：请在左侧「脚本文字输入」框中粘贴分镜表格内容（从文档复制即可），文字分析比图片识别更稳定可靠。</div>';
+    ['ana-main-col','ana-video-col','ana-scene-col'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=errHtml;});
+    return;
+  }
+
+  // Parse sections
+  var mainSection='',videoSection='',imageSection='';
+  var mainMatch=r.match(/---\s*主镜版提示词\s*---([\s\S]*?)(?=---\s*视频版提示词|$)/);
+  var videoMatch=r.match(/---\s*视频版提示词\s*---([\s\S]*?)(?=---\s*生图版提示词|$)/);
+  var imageMatch=r.match(/---\s*生图版提示词\s*---([\s\S]*?)$/);
+  mainSection=mainMatch?mainMatch[1].trim():r;
+  videoSection=videoMatch?videoMatch[1].trim():'';
+  imageSection=imageMatch?imageMatch[1].trim():'';
+
+  function renderCards(raw,color){
+    if(!raw)return '<div style="padding:16px;color:var(--t3)">暂无内容</div>';
+    // 支持【镜头N】、【第N组】、【第N段】格式
+    var isGrouped = /【第\d+[组段]/.test(raw);
+    if(isGrouped){
+      // Seedance分组格式：整段显示，带复制按钮
+      var groups = raw.split(/(?=---【第)/).filter(function(s){return s.trim()&&s.trim()!=='---';});
+      if(!groups.length) groups=[raw];
+      return groups.map(function(g, gi){
+        var titleM = g.match(/【第(\d+)[^】]*】/);
+        var title = titleM ? titleM[0].replace(/【|】/g,'') : '第'+(gi+1)+'组';
         var content = g.replace(/^---【[^】]+】---
 ?/,'').replace(/---\s*$/,'').trim();
         return '<div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;margin-bottom:14px;overflow:hidden">'
