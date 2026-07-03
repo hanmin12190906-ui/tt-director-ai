@@ -2698,11 +2698,11 @@ async function runAnalyzer(){
     var isGrouped = /【第\d+[组段]/.test(raw);
     if(isGrouped){
       // Seedance分组格式：整段显示，带复制按钮
-      var groups = raw.split(/(?=---【第\d+[组段])/).filter(function(s){return s.trim()&&s.trim()!=='---';});
+      var groups = raw.split(/(?=---【第)/).filter(function(s){return s.trim()&&s.trim()!=='---';});
       if(!groups.length) groups=[raw];
       return groups.map(function(g, gi){
-        var titleM = g.match(/【第(\d+)[组段]\s*([^】]*)】/);
-        var title = titleM ? '第'+titleM[1]+'组 '+titleM[2] : '第'+(gi+1)+'组';
+        var titleM = g.match(/【第(\d+)[^】]*】/);
+        var title = titleM ? titleM[0].replace(/【|】/g,'') : '第'+(gi+1)+'组';
         var content = g.replace(/^---【[^】]+】---
 ?/,'').replace(/---\s*$/,'').trim();
         return '<div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;margin-bottom:14px;overflow:hidden">'
