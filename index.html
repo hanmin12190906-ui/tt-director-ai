@@ -2620,14 +2620,12 @@ async function runAnalyzer(){
       return groups.map(function(g,gi){
         var m=g.match(/【第(\d+)组[^】]*】/);
         var title=m?m[0].replace(/【|】/g,''):'第'+(gi+1)+'组';
-        var body=g.replace(/^---[^
-]+
-/,'').replace(/---\s*$/,'').trim();
+        var firstNL=g.indexOf('\n');var body=(firstNL>=0?g.substring(firstNL+1):g).replace('---','').trim();
         var copyText=g.trim();
         return '<div style="background:var(--card);border:1px solid var(--b1);border-radius:10px;margin-bottom:14px;overflow:hidden">'
           +'<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(0,0,0,.25);border-bottom:1px solid var(--b1)">'
           +'<span style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:'+color+'">▶ '+esc(title)+'</span>'
-          +'<button class="bpr" style="font-size:10px;padding:3px 12px" onclick="navigator.clipboard.writeText('+JSON.stringify(copyText)+').then(function(){showToast('✅ 已复制第'+(gi+1)+'组')})">复制此组</button>'
+          +'<button class="bpr" style="font-size:10px;padding:3px 12px" onclick="var pre=this.closest(\'.sd-group\').querySelector(\'pre\');if(pre)navigator.clipboard.writeText(pre.textContent).then(function(){showToast(\'✅ 已复制\')})">复制此组</button>'
           +'</div>'
           +'<pre style="padding:14px;font-size:11px;line-height:1.85;color:var(--t1);white-space:pre-wrap;font-family:var(--font-mono);margin:0">'+esc(body)+'</pre>'
           +'</div>';
